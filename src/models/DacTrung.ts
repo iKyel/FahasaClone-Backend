@@ -4,7 +4,6 @@ import { IDacTrung } from "../interface/ModelInterface";
 const DacTrungSchema: Schema = new Schema(
   {
     ten: { type: String, require: true },
-    dacTrung_SanPham: { type: String, require: true },
   },
   {
     timestamps: true,

@@ -7,6 +7,11 @@ const HoaDonNhapSchema: Schema = new Schema({
     ref: "NhaCungCap",
     required: true,
   },
+  taiKhoanId: {
+    type: Schema.Types.ObjectId,
+    ref: "TaiKhoan",
+    required: true,
+  },
   thoiGian: { type: Date, default: Date.now },
   tongTien: { type: Number, required: true },
 });

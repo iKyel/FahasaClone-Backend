@@ -12,7 +12,6 @@ const TaiKhoanSchema: Schema = new Schema({
     ngaySinh: { type: String, required: true },
     loaiTK: { type: String, enum: ["Admin", "User"], required: true },
     sdt: { type: String, required: true, unique: true },
-    favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: "SanPham" }],
 }, {
     timestamps: true, 
 });

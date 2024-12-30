@@ -13,7 +13,6 @@ export interface ITaiKhoan extends Document {
   ngaySinh: string;
   loaiTK: string;
   sdt: string;
-  favorites: mongoose.Types.ObjectId[];
 }
 
 export interface ISanPham extends Document {
@@ -33,6 +32,11 @@ export interface ISanPham extends Document {
   dacTrung_SanPham: string;
 }
 
+export interface IYeuThich extends Document {
+  taiKhoan: mongoose.Types.ObjectId;
+  sanPham: mongoose.Types.ObjectId;
+}
+
 export interface IDanhGia extends Document {
   xepHang: number;
   binhLuan: string;
@@ -44,13 +48,10 @@ export interface IDanhGia extends Document {
 export interface IDanhMuc extends Document {
   ten: string;
   parent: mongoose.Types.ObjectId | null;
-  sanPham: mongoose.Types.ObjectId;
-  dacTrung_DanhMuc: string;
 }
 
 export interface IDacTrung extends Document {
   ten: string;
-  dacTrung_DanhMuc: string;
 }
 
 export interface IDacTrung_DanhMuc extends Document {
@@ -98,21 +99,23 @@ export interface IChiTietDonDat extends Document {
 }
 
 export interface INhaCungCap extends Document {
-    ten: string;
-    diaChi: string;
-    sdt: string;
-    email: string;
+  ten: string;
+  diaChi: string;
+  sdt: string;
+  email: string;
+  danhMucId: mongoose.Types.ObjectId;
 }
 
 export interface IHoaDonNhap extends Document {
-    nhaCungCapId: mongoose.Types.ObjectId;
-    thoiGian: Date;
-    tongTien: number;
-  }
+  nhaCungCapId: mongoose.Types.ObjectId;
+  taiKhoanId: mongoose.Types.ObjectId;
+  thoiGian: Date;
+  tongTien: number;
+}
 
-  export interface IChiTietHDN extends Document {
-    hoaDonNhapId: mongoose.Types.ObjectId;
-    sanPhamId: mongoose.Types.ObjectId;
-    soLuong: number;
-    thanhTien: number
-  }
+export interface IChiTietHDN extends Document {
+  hoaDonNhapId: mongoose.Types.ObjectId;
+  sanPhamId: mongoose.Types.ObjectId;
+  soLuong: number;
+  thanhTien: number;
+}

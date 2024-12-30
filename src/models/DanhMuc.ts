@@ -8,9 +8,7 @@ const DanhMucSchema: Schema = new Schema({
     ref: "DanhMuc",
     default: null,
   },
-  dacTrung_DanhMuc: {
-    type: String, required: true
-  }
+  
 });
 
 export default mongoose.model<IDanhMuc>("DanhMuc", DanhMucSchema);

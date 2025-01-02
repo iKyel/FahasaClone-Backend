@@ -58,4 +58,4 @@ const TaiKhoanSchema: Schema = new Schema(
     }
 );
 
-export default mongoose.model<ITaiKhoan>("TaiKhoan", TaiKhoanSchema)
+export default mongoose.model<ITaiKhoan>("TaiKhoan", TaiKhoanSchema, "TaiKhoans")

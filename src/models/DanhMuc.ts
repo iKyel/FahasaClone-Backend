@@ -13,4 +13,4 @@ const DanhMucSchema: Schema = new Schema({
     }
 });
 
-export default mongoose.model<IDanhMuc>("DanhMuc", DanhMucSchema);
+export default mongoose.model<IDanhMuc>("DanhMuc", DanhMucSchema, "DanhMucs");

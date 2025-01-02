@@ -21,7 +21,7 @@ const TaiKhoanSchema: Schema = new Schema(
             required: true
         },
         diaChi: {
-            type: String,
+            type: Array<String>,
             required: true
         },
         email: {

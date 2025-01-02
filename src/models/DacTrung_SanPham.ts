@@ -20,4 +20,4 @@ const DacTrung_SanPhamSchema: Schema = new Schema(
     }
 );
 
-export default mongoose.model<IDacTrung_SanPham>("DacTrung_SanPham", DacTrung_SanPhamSchema);
+export default mongoose.model<IDacTrung_SanPham>("DacTrung_SanPham", DacTrung_SanPhamSchema, "DacTrung_SanPhams");

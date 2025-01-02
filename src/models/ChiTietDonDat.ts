@@ -22,4 +22,4 @@ const ChiTietDonDatSchema: Schema = new Schema({
     },
 });
 
-export default mongoose.model<IChiTietDonDat>("ChiTietDonDat", ChiTietDonDatSchema);
+export default mongoose.model<IChiTietDonDat>("ChiTietDonDat", ChiTietDonDatSchema, "ChiTietDonDats");

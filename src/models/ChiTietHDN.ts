@@ -22,4 +22,4 @@ const ChiTietHDNSchema: Schema = new Schema({
     },
 });
 
-export default mongoose.model<IChiTietHDN>("ChiTietHDN", ChiTietHDNSchema);
+export default mongoose.model<IChiTietHDN>("ChiTietHDN", ChiTietHDNSchema, "ChiTietHDNs");

@@ -20,4 +20,4 @@ const DacTrung_DanhMucSchema: Schema = new Schema(
     }
 );
 
-export default mongoose.model<IDacTrung_DanhMuc>("DacTrung_DanhMuc", DacTrung_DanhMucSchema);
+export default mongoose.model<IDacTrung_DanhMuc>("DacTrung_DanhMuc", DacTrung_DanhMucSchema, "DacTrung_DanhMucs");

@@ -19,4 +19,4 @@ const YeuThichSchema: Schema = new Schema(
     }
 );
 
-export default mongoose.model<IYeuThich>("YeuThich", YeuThichSchema);
+export default mongoose.model<IYeuThich>("YeuThich", YeuThichSchema, "YeuThichs");

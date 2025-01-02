@@ -7,7 +7,7 @@ export interface ITaiKhoan extends Document {
     ten: string;
     userName: string;
     password: string;
-    diaChi: string;
+    diaChi: Array<string>;
     email: string;
     gioiTinh: "Nam" | "Nữ" | "Khác";
     ngaySinh: string;

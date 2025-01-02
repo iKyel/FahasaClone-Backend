@@ -2,21 +2,21 @@ import mongoose, { Schema } from "mongoose";
 import { IYeuThich } from "../interface/ModelInterface";
 
 const YeuThichSchema: Schema = new Schema(
-  {
-    taiKhoan: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "TaiKhoan",
-      required: true,
+    {
+        taiKhoanId: {
+            type: Schema.Types.ObjectId,
+            ref: "TaiKhoan",
+            required: true,
+        },
+        sanPhamId: {
+            type: Schema.Types.ObjectId,
+            ref: "SanPham",
+            required: true,
+        },
     },
-    SanPham: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "SanPham",
-      required: true,
-    },
-  },
-  {
-    timestamps: true,
-  }
+    {
+        timestamps: true,
+    }
 );
 
 export default mongoose.model<IYeuThich>("YeuThich", YeuThichSchema);

@@ -4,6 +4,7 @@ import cors from "cors";
 import { Request, Response, NextFunction } from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
+import morgan from "morgan";
 import multer from "multer";
 
 // db
@@ -18,21 +19,21 @@ dotenv.config(); // Load các biến môi trường từ file .env
 const app = express();
 const port = process.env.PORT || 3412;
 
-// sử dụng CORS Middleware
-app.use(cors());
-
-// cookie-parser
-app.use(cookieParser());
-
-// sử dụng middleware để phân tích dữ liệu JSON
-app.use(express.json());
+// Using middleware
+app.use(cors());    // sử dụng CORS Middleware
+app.use(morgan('dev'));     // HTTP request logger
+app.use(cookieParser());    // cookie-parser
+app.use(express.json());    // phân tích dữ liệu JSON
 
 // route
+app.get('/', (req: Request, res: Response) => {
+    res.status(200).json("Hello world");
+})
 
 // Ket noi db
 connectDB();
 
 // Ket noi server
 app.listen(port, () => {
-  console.log(`Server dang chay tren cong http://localhost:${port}`);
+    console.log(`Server dang chay tren cong http://localhost:${port}`);
 });

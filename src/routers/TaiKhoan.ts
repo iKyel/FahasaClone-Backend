@@ -1,18 +1,37 @@
-import express from "express"
-import { registerAccount, loginAccount } from "../controllers/TaiKhoan";
+import express from "express";
+import {
+  dangKiTaiKhoan,
+  dangNhapTaiKhoan,
+  getDanhSachTaiKhoanKhachHang,
+  getDanhSachTaiKhoanNhanVien,
+  timKiemTaiKhoan,
+  khoaTaiKhoan,
+} from "../controllers/TaiKhoan";
 
-const taiKhoanRouter = express.Router();
+const router = express.Router();
 
 /**
  * @route       POST '/api/taiKhoan/register'
  * @description Đăng ký một tài khoản mới
  */
-taiKhoanRouter.post('/register', registerAccount);
+router.post("/dangki", dangKiTaiKhoan);
 
 /**
  * @route       POST '/api/taiKhoan/login'
  * @description Đăng nhập vào tài khoản
  */
-taiKhoanRouter.post('/login', loginAccount);
+router.post("/dangnhap", dangNhapTaiKhoan);
 
-export default taiKhoanRouter;
+// GET /api/taikhoan/khachhang - Lấy danh sách tài khoản khách hàng (loại TK: KH)
+router.get("/khachhang", getDanhSachTaiKhoanKhachHang);
+
+// GET /api/taikhoan/nhanvien - Lấy danh sách tài khoản khách hàng (loại TK: KH)
+router.get("/nhanvien", getDanhSachTaiKhoanNhanVien);
+
+// POST /api/taikhoan/timkiem - Tìm kiếm và lấy danh sách tài khoản
+router.post("/timkiem", timKiemTaiKhoan);
+
+// PATCH /api/taikhoan/:userId/khoa - Khóa hoặc hủy khóa tài khoản
+router.patch("/:userId/khoa", khoaTaiKhoan);
+
+export default router;

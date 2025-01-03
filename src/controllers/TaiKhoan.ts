@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import TaiKhoan from "../models/TaiKhoan";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import { AuthenticatedRequest } from "../interface/AutheticatedRequest";
 
 // Load environment variables from .env file
 dotenv.config();
@@ -12,7 +13,7 @@ const SECRET_KEY = process.env.JWT_SECRET || "";
  * @description Đăng ký một tài khoản mới
  * @param {Request} req - Request object 
  * @param {Response} res - Response object
- * @returns message to client
+ * @returns message
  */
 const registerAccount = async (req: Request, res: Response) => {
     try {
@@ -44,7 +45,7 @@ const registerAccount = async (req: Request, res: Response) => {
  * @description Đăng nhập vào tài khoản
  * @param {Request} req - Request object 
  * @param {Response} res - Response object
- * @returns message to client
+ * @returns message, user
  */
 const loginAccount = async (req: Request, res: Response) => {
     const { userName, password } = req.body;
@@ -59,8 +60,8 @@ const loginAccount = async (req: Request, res: Response) => {
                         userName: user.userName
                     },
                     SECRET_KEY,
-                    { 
-                        expiresIn: '1d' 
+                    {
+                        expiresIn: '1d'
                     }
                 );
                 res.cookie('token', token, {
@@ -68,10 +69,10 @@ const loginAccount = async (req: Request, res: Response) => {
                     secure: false,
                     maxAge: 24 * 60 * 60 * 1000     // 1 day in milliseconds
                 });
-                res.status(200).json({ 
-                    message: 'Đăng nhập thành công!', 
-                    userData: {
-                        _id: user._id, 
+                res.status(200).json({
+                    message: 'Đăng nhập thành công!',
+                    user: {
+                        _id: user._id,
                         hoDem: user.hoDem,
                         ten: user.ten,
                         userName: user.userName,
@@ -83,6 +84,34 @@ const loginAccount = async (req: Request, res: Response) => {
         }
         // userName or password not correct
         res.status(400).json({ message: 'Tên đăng nhập hoặc mật khẩu không đúng!' });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ message: 'Lỗi hệ thống máy chủ.' });
+    }
+}
+
+/**
+ * @description Cập nhật thông tin cá nhân
+ * @param {Request} req - Request object 
+ * @param {Response} res - Response object
+ * @returns message, user
+ */
+export const capNhatTaiKhoan = async (req: AuthenticatedRequest, res: Response) => {
+    const userName = req.user?.userName;
+    try {
+        const updatedFields = req.body;
+        const updatedUser = await TaiKhoan.findOneAndUpdate(
+            { userName },
+            { ...updatedFields },
+            { new: true }
+        );
+        res.status(200).json({
+            message: 'Cập nhật thông tin thành công!',
+            user: {
+                ...updatedUser?._doc,
+                password: undefined
+            }
+        });
     } catch (err) {
         console.log(err);
         res.status(500).json({ message: 'Lỗi hệ thống máy chủ.' });

@@ -34,4 +34,4 @@ const DanhGiaSchema: Schema = new Schema(
     }
 );
 
-export default mongoose.model<IDanhGia>("DanhGia", DanhGiaSchema);
+export default mongoose.model<IDanhGia>("DanhGia", DanhGiaSchema, "DanhGias");

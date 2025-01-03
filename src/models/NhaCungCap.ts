@@ -13,4 +13,4 @@ const NhaCungCapSchema = new Schema<INhaCungCap>({
     },
 });
 
-export default mongoose.model<INhaCungCap>("NhaCungCap", NhaCungCapSchema);
+export default mongoose.model<INhaCungCap>("NhaCungCap", NhaCungCapSchema, "NhaCungCaps");

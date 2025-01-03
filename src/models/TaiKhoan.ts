@@ -21,22 +21,17 @@ const TaiKhoanSchema: Schema = new Schema(
             required: true
         },
         diaChi: {
-            type: String,
-            required: true
+            type: Array<String>,
         },
         email: {
             type: String,
-            required: true,
-            unique: true
         },
         gioiTinh: {
             type: String,
             enum: ["Nam", "Nữ", "Khác"],
-            required: true
         },
         ngaySinh: {
             type: String,
-            required: true
         },
         loaiTK: {
             type: String,
@@ -49,7 +44,6 @@ const TaiKhoanSchema: Schema = new Schema(
         },
         sdt: {
             type: String,
-            required: true,
             unique: true
         }
     },
@@ -58,4 +52,4 @@ const TaiKhoanSchema: Schema = new Schema(
     }
 );
 
-export default mongoose.model<ITaiKhoan>("TaiKhoan", TaiKhoanSchema)
+export default mongoose.model<ITaiKhoan>("TaiKhoan", TaiKhoanSchema, "TaiKhoans")

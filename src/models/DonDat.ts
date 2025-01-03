@@ -59,4 +59,4 @@ const DonDatSchema: Schema = new Schema(
     }
 );
 
-export default mongoose.model<IDonDat>("DonDat", DonDatSchema);
+export default mongoose.model<IDonDat>("DonDat", DonDatSchema, "DonDats");

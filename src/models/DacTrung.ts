@@ -10,4 +10,4 @@ const DacTrungSchema: Schema = new Schema(
     }
 );
 
-export default mongoose.model<IDacTrung>("DacTrung", DacTrungSchema);
+export default mongoose.model<IDacTrung>("DacTrung", DacTrungSchema, "DacTrungs");

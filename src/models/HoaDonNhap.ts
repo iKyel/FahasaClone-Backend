@@ -22,4 +22,4 @@ const HoaDonNhapSchema: Schema = new Schema(
     }
 );
 
-export default mongoose.model<IHoaDonNhap>("HoaDonNhap", HoaDonNhapSchema);
+export default mongoose.model<IHoaDonNhap>("HoaDonNhap", HoaDonNhapSchema, "HoaDonNhaps");

@@ -54,4 +54,4 @@ const SanPhamSchema: Schema = new Schema(
     }
 );
 
-export default mongoose.model<ISanPham>("SanPham", SanPhamSchema)
+export default mongoose.model<ISanPham>("SanPham", SanPhamSchema, "SanPhams")

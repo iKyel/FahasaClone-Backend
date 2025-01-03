@@ -1,49 +1,49 @@
 import express from "express";
 import {
-  dangKiTaiKhoan,
-  dangNhapTaiKhoan,
-  getDanhSachTaiKhoanKhachHang,
-  getDanhSachTaiKhoanNhanVien,
-  timKiemTaiKhoan,
-  khoaTaiKhoan,
+  register,
+  login,
+  getCustomers,
+  getEmployees,
+  search,
+  lock,
 } from "../controllers/TaiKhoan";
 
 const router = express.Router();
 
 /**
- * @route       POST '/api/taiKhoan/register'
+ * @route       POST '/api/account/register'
  * @description Đăng ký một tài khoản mới
  */
-router.post("/dangki", dangKiTaiKhoan);
+router.post("/register", register);
 
 /**
- * @route       POST '/api/taiKhoan/login'
+ * @route       POST '/api/account/login'
  * @description Đăng nhập vào tài khoản
  */
-router.post("/dangnhap", dangNhapTaiKhoan);
+router.post("/login", login);
 
 /**
- * @route       GET '/api/taiKhoan/khachhang'
+ * @route       GET '/api/account/getCustomers'
  * @description Lấy danh sách tài khoản khách hàng
  */
-router.get("/khachhang", getDanhSachTaiKhoanKhachHang);
+router.get("/getCustomers", getCustomers);
 
 /**
- * @route       GET '/api/taiKhoan/nhanvien'
+ * @route       GET '/api/account/getEmployees'
  * @description Lấy danh sách tài khoản nhân viên
  */
-router.get("/nhanvien", getDanhSachTaiKhoanNhanVien);
+router.get("/getEmployees", getEmployees);
 
 /**
- * @route       GET '/api/taiKhoan/timkiem'
+ * @route       GET '/api/account/search'
  * @description Tìm kiếm tài khoản
  */
-router.post("/timkiem", timKiemTaiKhoan);
+router.post("/search", search);
 
 /**
- * @route       PATCH '/api/:userId/khoa'
+ * @route       PATCH '/api/account/:userId/lock'
  * @description LKhoá tài khoản
  */
-router.patch("/:userId/khoa", khoaTaiKhoan);
+router.patch("/:userId/lockAccount", lock);
 
 export default router;

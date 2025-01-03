@@ -26,7 +26,7 @@ app.use(cookieParser());    // cookie-parser
 app.use(express.json());    // phân tích dữ liệu JSON
 
 // route
-app.use('/api/taiKhoan', taiKhoanRouter);
+app.use('/api/account', taiKhoanRouter);
 
 app.get('/', (req: Request, res: Response) => {
     res.status(200).json("Hello world");

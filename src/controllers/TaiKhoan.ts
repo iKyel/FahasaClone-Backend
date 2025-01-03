@@ -15,7 +15,7 @@ const SECRET_KEY = process.env.JWT_SECRET || "";
  * @param {Response} res - Response object
  * @returns message to client
  */
-export const dangKiTaiKhoan = async (req: Request, res: Response) => {
+export const register = async (req: Request, res: Response) => {
   try {
     const { hoDem, ten, userName, password, loaiTK } = req.body;
     // Check if userName already exists
@@ -48,7 +48,7 @@ export const dangKiTaiKhoan = async (req: Request, res: Response) => {
  * @param {Response} res - Response object
  * @returns message to client
  */
-export const dangNhapTaiKhoan = async (req: Request, res: Response) => {
+export const login = async (req: Request, res: Response) => {
   const { userName, password } = req.body;
   try {
     // Check userName has existed?
@@ -100,10 +100,7 @@ export const dangNhapTaiKhoan = async (req: Request, res: Response) => {
  * @param {Response} res - Response object
  * @returns message to client
  */
-export const getDanhSachTaiKhoanKhachHang = async (
-  req: Request,
-  res: Response
-) => {
+export const getCustomers = async (req: Request, res: Response) => {
   try {
     const taiKhoanKH = await TaiKhoan.find({ loaiTK: "KH" }).select(
       "-password -loaiTK"
@@ -127,10 +124,7 @@ export const getDanhSachTaiKhoanKhachHang = async (
  * @param {Response} res - Response object
  * @returns message to client
  */
-export const getDanhSachTaiKhoanNhanVien = async (
-  req: Request,
-  res: Response
-) => {
+export const getEmployees = async (req: Request, res: Response) => {
   try {
     const taiKhoanNV = await TaiKhoan.find({
       loaiTK: "NV",
@@ -155,7 +149,7 @@ export const getDanhSachTaiKhoanNhanVien = async (
  * @param {Response} res - Response object
  * @returns message to client
  */
-export const timKiemTaiKhoan = async (req: Request, res: Response) => {
+export const search = async (req: Request, res: Response) => {
   try {
     const { searchUser, loaiTK } = req.query;
 
@@ -191,7 +185,7 @@ export const timKiemTaiKhoan = async (req: Request, res: Response) => {
  * @param {Response} res - Response object
  * @returns message to client
  */
-export const khoaTaiKhoan = async (req: Request, res: Response) => {
+export const lock = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
     const { trangThai } = req.body;

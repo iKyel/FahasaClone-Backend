@@ -22,16 +22,28 @@ router.post("/dangki", dangKiTaiKhoan);
  */
 router.post("/dangnhap", dangNhapTaiKhoan);
 
-// GET /api/taikhoan/khachhang - Lấy danh sách tài khoản khách hàng (loại TK: KH)
+/**
+ * @route       GET '/api/taiKhoan/khachhang'
+ * @description Lấy danh sách tài khoản khách hàng
+ */
 router.get("/khachhang", getDanhSachTaiKhoanKhachHang);
 
-// GET /api/taikhoan/nhanvien - Lấy danh sách tài khoản khách hàng (loại TK: KH)
+/**
+ * @route       GET '/api/taiKhoan/nhanvien'
+ * @description Lấy danh sách tài khoản nhân viên
+ */
 router.get("/nhanvien", getDanhSachTaiKhoanNhanVien);
 
-// POST /api/taikhoan/timkiem - Tìm kiếm và lấy danh sách tài khoản
+/**
+ * @route       GET '/api/taiKhoan/timkiem'
+ * @description Tìm kiếm tài khoản
+ */
 router.post("/timkiem", timKiemTaiKhoan);
 
-// PATCH /api/taikhoan/:userId/khoa - Khóa hoặc hủy khóa tài khoản
+/**
+ * @route       PATCH '/api/:userId/khoa'
+ * @description LKhoá tài khoản
+ */
 router.patch("/:userId/khoa", khoaTaiKhoan);
 
 export default router;

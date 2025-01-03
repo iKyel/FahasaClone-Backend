@@ -24,6 +24,7 @@ export const dangKiTaiKhoan = async (req: Request, res: Response) => {
       res.status(400).json({ message: "UserName đã tồn tại!" });
       return;
     }
+
     // Create a new account
     const newAccount = new TaiKhoan({
       hoDem,

@@ -44,7 +44,6 @@ const TaiKhoanSchema: Schema = new Schema(
         },
         sdt: {
             type: String,
-            unique: true
         }
     },
     {

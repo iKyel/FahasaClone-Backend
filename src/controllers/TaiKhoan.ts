@@ -1,23 +1,28 @@
 import { Request, Response } from "express";
-import TaiKhoan from "../models/TaiKhoan"; // Import your TaiKhoan model
+import TaiKhoan from "../models/TaiKhoan";
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+
+// Load environment variables from .env file
+dotenv.config();
+
+const SECRET_KEY = process.env.JWT_SECRET || "";
 
 /**
  * @description Đăng ký một tài khoản mới
- * @param req 
- * @param res 
- * @returns message
+ * @param {Request} req - Request object 
+ * @param {Response} res - Response object
+ * @returns message to client
  */
 const registerAccount = async (req: Request, res: Response) => {
     try {
         const { hoDem, ten, userName, password, loaiTK } = req.body;
-
         // Check if userName already exists
         const existingUser = await TaiKhoan.findOne({ userName });
         if (existingUser) {
-            res.status(400).json({ message: "UserName already exists" });
+            res.status(400).json({ message: "UserName đã tồn tại!" });
             return;
         }
-        
         // Create a new account
         const newAccount = new TaiKhoan({
             hoDem,
@@ -26,14 +31,62 @@ const registerAccount = async (req: Request, res: Response) => {
             password,
             loaiTK
         });
-
         // Save the new account to the database
         await newAccount.save();
-        res.status(200).json({ message: "Register successfully" });
+        res.status(200).json({ message: "Đăng ký thành công!" });
     } catch (error) {
         console.log(error);
-        res.status(500).json({ message: "Internal Server Error" });
+        res.status(500).json({ message: "Lỗi hệ thống máy chủ." });
     }
 }
 
-export { registerAccount };
+/**
+ * @description Đăng nhập vào tài khoản
+ * @param {Request} req - Request object 
+ * @param {Response} res - Response object
+ * @returns message to client
+ */
+const loginAccount = async (req: Request, res: Response) => {
+    const { userName, password } = req.body;
+    try {
+        // Check userName has existed?
+        const user = await TaiKhoan.findOne({ userName });
+        if (user) {
+            if (password === user.password) {   // Check password
+                const token = jwt.sign(
+                    {
+                        userId: user._id,
+                        userName: user.userName
+                    },
+                    SECRET_KEY,
+                    { 
+                        expiresIn: '1d' 
+                    }
+                );
+                res.cookie('token', token, {
+                    httpOnly: true,
+                    secure: false,
+                    maxAge: 24 * 60 * 60 * 1000     // 1 day in milliseconds
+                });
+                res.status(200).json({ 
+                    message: 'Đăng nhập thành công!', 
+                    userData: {
+                        _id: user._id, 
+                        hoDem: user.hoDem,
+                        ten: user.ten,
+                        userName: user.userName,
+                        loaiTk: user.loaiTK
+                    }
+                });
+                return;
+            }
+        }
+        // userName or password not correct
+        res.status(400).json({ message: 'Tên đăng nhập hoặc mật khẩu không đúng!' });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ message: 'Lỗi hệ thống máy chủ.' });
+    }
+}
+
+export { registerAccount, loginAccount };

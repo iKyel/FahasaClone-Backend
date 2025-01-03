@@ -22,21 +22,16 @@ const TaiKhoanSchema: Schema = new Schema(
         },
         diaChi: {
             type: Array<String>,
-            required: true
         },
         email: {
             type: String,
-            required: true,
-            unique: true
         },
         gioiTinh: {
             type: String,
             enum: ["Nam", "Nữ", "Khác"],
-            required: true
         },
         ngaySinh: {
             type: String,
-            required: true
         },
         loaiTK: {
             type: String,
@@ -49,7 +44,6 @@ const TaiKhoanSchema: Schema = new Schema(
         },
         sdt: {
             type: String,
-            required: true,
             unique: true
         }
     },

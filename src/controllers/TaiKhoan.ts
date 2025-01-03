@@ -11,46 +11,46 @@ const SECRET_KEY = process.env.JWT_SECRET || "";
 
 /**
  * @description Đăng ký một tài khoản mới
- * @param {Request} req - Request object 
+ * @param {Request} req - Request object
  * @param {Response} res - Response object
  * @returns message
  */
-const registerAccount = async (req: Request, res: Response) => {
+export const dangKiTaiKhoan = async (req: Request, res: Response) => {
     try {
         const { hoDem, ten, userName, password, loaiTK } = req.body;
-        // Check if userName already exists
+        // Ktra userName đã tồn tại chưa?
         const existingUser = await TaiKhoan.findOne({ userName });
         if (existingUser) {
             res.status(400).json({ message: "UserName đã tồn tại!" });
             return;
         }
-        // Create a new account
+        // Tao tài khoản mới
         const newAccount = new TaiKhoan({
             hoDem,
             ten,
             userName,
             password,
-            loaiTK
+            loaiTK,
         });
-        // Save the new account to the database
+        // Lưu vào database
         await newAccount.save();
         res.status(200).json({ message: "Đăng ký thành công!" });
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: "Lỗi hệ thống máy chủ." });
     }
-}
+};
 
 /**
  * @description Đăng nhập vào tài khoản
- * @param {Request} req - Request object 
+ * @param {Request} req - Request object
  * @param {Response} res - Response object
  * @returns message, user
  */
-const loginAccount = async (req: Request, res: Response) => {
+export const dangNhapTaiKhoan = async (req: Request, res: Response) => {
     const { userName, password } = req.body;
     try {
-        // Check userName has existed?
+        // Ktra userName có tồn tại không?
         const user = await TaiKhoan.findOne({ userName });
         if (user) {
             if (password === user.password) {   // Check password
@@ -82,7 +82,7 @@ const loginAccount = async (req: Request, res: Response) => {
                 return;
             }
         }
-        // userName or password not correct
+        // UserName hoặc password ko đúng
         res.status(400).json({ message: 'Tên đăng nhập hoặc mật khẩu không đúng!' });
     } catch (err) {
         console.log(err);
@@ -117,5 +117,3 @@ export const capNhatTaiKhoan = async (req: AuthenticatedRequest, res: Response) 
         res.status(500).json({ message: 'Lỗi hệ thống máy chủ.' });
     }
 }
-
-export { registerAccount, loginAccount };

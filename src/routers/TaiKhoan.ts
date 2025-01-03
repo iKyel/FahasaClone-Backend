@@ -1,25 +1,34 @@
-import express from "express"
-import { registerAccount, loginAccount, capNhatTaiKhoan } from "../controllers/TaiKhoan";
+import express from "express";
+import {
+    dangKiTaiKhoan,
+    dangNhapTaiKhoan,
+    capNhatTaiKhoan
+    //   getDanhSachTaiKhoanKhachHang,
+    //   getDanhSachTaiKhoanNhanVien,
+    //   timKiemTaiKhoan,
+    //   khoaTaiKhoan,
+} from "../controllers/TaiKhoan";
 import verifyToken from "../middlewares/verifyToken";
 
-const taiKhoanRouter = express.Router();
+const router = express.Router();
 
 /**
  * @route       POST '/api/taiKhoan/register'
  * @description Đăng ký một tài khoản mới
  */
-taiKhoanRouter.post('/register', registerAccount);
+router.post("/dangki", dangKiTaiKhoan);
 
 /**
  * @route       POST '/api/taiKhoan/login'
  * @description Đăng nhập vào tài khoản
  */
-taiKhoanRouter.post('/login', loginAccount);
+router.post("/dangnhap", dangNhapTaiKhoan);
 
 /**
  * @route       PUT '/api/taiKhoan/updateProfile'
  * @description Cập nhật thông tin tài khoản
  */
-taiKhoanRouter.put('/capNhatTaiKhoan', verifyToken, capNhatTaiKhoan);
+router.put('/capNhatTaiKhoan', verifyToken, capNhatTaiKhoan);
 
-export default taiKhoanRouter;
+
+export default router;

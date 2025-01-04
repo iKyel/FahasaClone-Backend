@@ -1,12 +1,19 @@
 import express from "express";
 import {
-  register,
-  login,
-  getCustomers,
-  getEmployees,
-  search,
-  lock,
+    register,
+    login,
+    updateAccount,
+    createAddress,
+    deleteAddress,
+    setDefaultAddress,
+    changePassword,
+    
+    getCustomers,
+    getEmployees,
+    search,
+    lock,
 } from "../controllers/TaiKhoan";
+import verifyToken from "../middlewares/verifyToken";
 
 const router = express.Router();
 
@@ -21,6 +28,38 @@ router.post("/register", register);
  * @description Đăng nhập vào tài khoản
  */
 router.post("/login", login);
+
+/**
+ * @route       PUT '/api/account/updateAccount'
+ * @description Cập nhật thông tin tài khoản
+ */
+router.put('/updateAccount', verifyToken, updateAccount);
+
+/**
+ * @route       POST '/api/account/createAddress'
+ * @description Thêm địa chỉ của tài khoản
+ */
+router.post('/createAddress', verifyToken, createAddress);
+
+/**
+ * @route       DELETE '/api/account/deleteAddress/:idx'
+ * @description Xóa địa chỉ của tài khoản
+ */
+router.delete('/deleteAddress/:idx', verifyToken, deleteAddress);
+
+/**
+ * @route       PUT '/api/account/setDefaultAddress'
+ * @description Đặt làm địa chỉ mặc định
+ */
+router.put('/setDefaultAddress', verifyToken, setDefaultAddress);
+
+/**
+ * @route       PUT '/api/account/changePassword'
+ * @description Đổi mật khẩu tài khoản
+ */
+router.put('/changePassword', verifyToken, changePassword);
+
+//--------------------------------------------------------//
 
 /**
  * @route       GET '/api/account/getCustomers'
@@ -45,5 +84,6 @@ router.post("/search", search);
  * @description LKhoá tài khoản
  */
 router.patch("/:userId/lockAccount", lock);
+
 
 export default router;

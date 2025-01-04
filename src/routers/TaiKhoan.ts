@@ -1,34 +1,39 @@
 import express from "express";
 import {
-    dangKiTaiKhoan,
-    dangNhapTaiKhoan,
-    capNhatTaiKhoan,
+    register,
+    login,
+    updateAccount,
     createAddress,
     deleteAddress,
     setDefaultAddress,
-    changePassword
+    changePassword,
+    
+    getCustomers,
+    getEmployees,
+    search,
+    lock,
 } from "../controllers/TaiKhoan";
 import verifyToken from "../middlewares/verifyToken";
 
 const router = express.Router();
 
 /**
- * @route       POST '/api/taiKhoan/register'
+ * @route       POST '/api/account/register'
  * @description Đăng ký một tài khoản mới
  */
-router.post("/dangKi", dangKiTaiKhoan);
+router.post("/register", register);
 
 /**
- * @route       POST '/api/taiKhoan/login'
+ * @route       POST '/api/account/login'
  * @description Đăng nhập vào tài khoản
  */
-router.post("/dangNhap", dangNhapTaiKhoan);
+router.post("/login", login);
 
 /**
- * @route       PUT '/api/taiKhoan/capNhatTaiKhoan'
+ * @route       PUT '/api/account/updateAccount'
  * @description Cập nhật thông tin tài khoản
  */
-router.put('/capNhatTaiKhoan', verifyToken, capNhatTaiKhoan);
+router.put('/updateAccount', verifyToken, updateAccount);
 
 /**
  * @route       POST '/api/account/createAddress'
@@ -53,6 +58,32 @@ router.put('/setDefaultAddress', verifyToken, setDefaultAddress);
  * @description Đổi mật khẩu tài khoản
  */
 router.put('/changePassword', verifyToken, changePassword);
+
+//--------------------------------------------------------//
+
+/**
+ * @route       GET '/api/account/getCustomers'
+ * @description Lấy danh sách tài khoản khách hàng
+ */
+router.get("/getCustomers", getCustomers);
+
+/**
+ * @route       GET '/api/account/getEmployees'
+ * @description Lấy danh sách tài khoản nhân viên
+ */
+router.get("/getEmployees", getEmployees);
+
+/**
+ * @route       GET '/api/account/search'
+ * @description Tìm kiếm tài khoản
+ */
+router.post("/search", search);
+
+/**
+ * @route       PATCH '/api/account/:userId/lock'
+ * @description LKhoá tài khoản
+ */
+router.patch("/:userId/lockAccount", lock);
 
 
 export default router;

@@ -3,6 +3,7 @@ import TaiKhoan from "../models/TaiKhoan";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { AuthenticatedRequest } from "../interface/AutheticatedRequest";
+import bcrypt from "bcrypt";
 
 // Load environment variables from .env file
 dotenv.config();
@@ -24,16 +25,16 @@ export const dangKiTaiKhoan = async (req: Request, res: Response) => {
             res.status(400).json({ message: "UserName đã tồn tại!" });
             return;
         }
+        // Mã hóa mật khẩu
+        const hashedPassword = await bcrypt.hash(password, 10);
         // Tao tài khoản mới
-        const newAccount = new TaiKhoan({
+        await TaiKhoan.create({
             hoDem,
             ten,
             userName,
-            password,
-            loaiTK,
+            password: hashedPassword,
+            loaiTK
         });
-        // Lưu vào database
-        await newAccount.save();
         res.status(200).json({ message: "Đăng ký thành công!" });
     } catch (error) {
         console.log(error);
@@ -53,7 +54,10 @@ export const dangNhapTaiKhoan = async (req: Request, res: Response) => {
         // Ktra userName có tồn tại không?
         const user = await TaiKhoan.findOne({ userName });
         if (user) {
-            if (password === user.password) {   // Check password
+            // Ktra password có khớp không?
+            const isMatch = await bcrypt.compare(password, user.password);
+            if (isMatch) {
+                // Nếu khớp, tạo token và gửi về client qua cookie
                 const token = jwt.sign(
                     {
                         userId: user._id,
@@ -112,6 +116,131 @@ export const capNhatTaiKhoan = async (req: AuthenticatedRequest, res: Response) 
                 password: undefined
             }
         });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ message: 'Lỗi hệ thống máy chủ.' });
+    }
+}
+
+/**
+ * @description Thêm địa chỉ của tài khoản
+ * @param {Request} req - Request object 
+ * @param {Response} res - Response object
+ * @returns message, user
+ */
+export const createAddress = async (req: AuthenticatedRequest, res: Response) => {
+    try {
+        const { userName } = req.user!;
+        const { newAddress } = req.body;
+        const updatedUser = await TaiKhoan.findOneAndUpdate(
+            { userName },
+            {
+                $push: {
+                    diaChi: newAddress
+                }
+            },
+            { new: true }
+        );
+        res.status(200).json({
+            message: 'Thêm địa chỉ thành công!',
+            user: {
+                ...updatedUser?._doc,
+                password: undefined
+            }
+        });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ message: 'Lỗi hệ thống máy chủ.' });
+    }
+}
+
+/**
+ * @description Xóa địa chỉ của tài khoản
+ * @param {Request} req - Request object 
+ * @param {Response} res - Response object
+ * @returns message, diaChi[]
+ */
+export const deleteAddress = async (req: AuthenticatedRequest, res: Response) => {
+    try {
+        const addressIdx = req.params.idx;
+        const { userName } = req.user!;
+        const user = await TaiKhoan.findOne({ userName });
+        if (!user) {
+            res.status(400).json({ message: 'Tài khoản không tồn tại!' });
+            return;
+        }
+        const addresses = user.diaChi;
+        const updatedAddresses = addresses.filter((_, idx) => idx !== +addressIdx);
+        user.diaChi = updatedAddresses;
+        await user.save();
+        res.status(200).json({
+            message: 'Cập nhật địa chỉ thành công!',
+            diaChi: user?.diaChi
+        });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ message: 'Lỗi hệ thống máy chủ.' });
+    }
+}
+
+/**
+ * @description Đặt làm địa chỉ mặc định
+ * @param {Request} req - Request object 
+ * @param {Response} res - Response object
+ * @returns message, diaChi[]
+ */
+export const setDefaultAddress = async (req: AuthenticatedRequest, res: Response) => {
+    try {
+        const addressIdx = req.body.idx;
+        const { userName } = req.user!;
+        const user = await TaiKhoan.findOne({ userName });
+        if (!user) {
+            res.status(400).json({ message: 'Tài khoản không tồn tại!' });
+            return;
+        }
+        const addresses = user.diaChi;
+        // Lấy địa chỉ được chọn và đặt lên đầu mảng (vị trí mặc định)
+        const [selectedAddress] = addresses.splice(addressIdx, 1);
+        addresses.unshift(selectedAddress);
+        // Lưu vào csdl
+        user.diaChi = addresses;
+        await user.save();
+        res.status(200).json({
+            message: 'Đặt địa chỉ mặc định thành công!',
+            diaChi: user?.diaChi
+        });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ message: 'Lỗi hệ thống máy chủ.' });
+    }
+}
+
+/**
+ * @description Đổi mật khẩu tài khoản
+ * @param {Request} req - Request object
+ * @param {Response} res - Response object
+ * @returns message
+ */
+export const changePassword = async (req: AuthenticatedRequest, res: Response) => {
+    try {
+        const { oldPassword, newPassword } = req.body;
+        const { userName } = req.user!;
+        const user = await TaiKhoan.findOne({ userName });
+        if (!user) {
+            res.status(400).json({ message: 'Tài khoản không tồn tại!' });
+            return;
+        }
+        // Ktra mật khẩu cũ có khớp không?
+        const isMatch = await bcrypt.compare(oldPassword, user.password);
+        if (!isMatch) {
+            res.status(400).json({ message: 'Mật khẩu cũ không đúng!' });
+            return;
+        }
+        // Mã hóa mật khẩu mới
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        user.password = hashedPassword;
+        await user.save();
+        res.status(200).json({ message: 'Đổi mật khẩu thành công!' });
     } catch (err) {
         console.log(err);
         res.status(500).json({ message: 'Lỗi hệ thống máy chủ.' });

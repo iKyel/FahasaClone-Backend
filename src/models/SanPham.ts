@@ -38,7 +38,7 @@ const SanPhamSchema: Schema = new Schema(
             },
         },
         khuyenMai: {
-            type: String,
+            type: Number,
         },
         moTa: {
             type: String
@@ -48,6 +48,9 @@ const SanPhamSchema: Schema = new Schema(
             ref: "DanhMuc",
             required: true
         },
+        hinhAnhUrl: {
+            type: String
+        }
     },
     {
         timestamps: true,

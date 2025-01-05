@@ -188,7 +188,6 @@ export const search = async (req: Request, res: Response) => {
 export const lock = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
-    const { trangThai } = req.body;
 
     if (!mongoose.Types.ObjectId.isValid(userId)) {
       return res.status(400).json({
@@ -196,11 +195,8 @@ export const lock = async (req: Request, res: Response) => {
       });
     }
 
-    const taiKhoan = await TaiKhoan.findByIdAndUpdate(
-      userId,
-      { trangThai: trangThai },
-      { new: true }
-    );
+    // Tìm tài khoản để lấy trạng thái hiện tại
+    const taiKhoan = await TaiKhoan.findById(userId);
 
     if (!taiKhoan) {
       return res.status(404).json({
@@ -208,10 +204,18 @@ export const lock = async (req: Request, res: Response) => {
       });
     }
 
+    // Đảo ngược trạng thái hiện tại
+    const trangThaiMoi = !taiKhoan.trangThai;
+
+    // Cập nhật trạng thái mới
+    taiKhoan.trangThai = trangThaiMoi;
+    await taiKhoan.save();
+
     res.status(200).json({
       message: `Tài khoản đã được ${
-        trangThai ? "mở khóa" : "khóa"
+        trangThaiMoi ? "mở khóa" : "khóa"
       } thành công!`,
+      data: { userId, trangThai: trangThaiMoi },
     });
   } catch (error) {
     res.status(500).json({
@@ -220,3 +224,4 @@ export const lock = async (req: Request, res: Response) => {
     });
   }
 };
+

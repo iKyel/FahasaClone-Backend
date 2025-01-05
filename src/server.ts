@@ -20,7 +20,12 @@ const app = express();
 const port = process.env.PORT || 3412;
 
 // Using middleware
-app.use(cors());    // sử dụng CORS Middleware
+app.use(cors({
+    origin: 'http://localhost:3000/',
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+    allowedHeaders: ['Content-Type'],
+    credentials: true
+}));    // sử dụng CORS Middleware
 app.use(morgan('dev'));     // HTTP request logger
 app.use(cookieParser());    // cookie-parser
 app.use(express.json());    // phân tích dữ liệu JSON

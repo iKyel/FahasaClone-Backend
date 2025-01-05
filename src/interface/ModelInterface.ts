@@ -30,7 +30,7 @@ export interface ISanPham extends Document {
   khuyenMai?: Number;
   moTa?: string;
   danhMucId: mongoose.Types.ObjectId;
-  hinhAnhUrl: string;
+  imageUrl: string;
   createdAt: Date;
 }
 

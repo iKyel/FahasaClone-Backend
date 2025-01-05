@@ -48,7 +48,7 @@ const SanPhamSchema: Schema = new Schema(
             ref: "DanhMuc",
             required: true
         },
-        hinhAnhUrl: {
+        imageUrl: {
             type: String
         }
     },

@@ -12,7 +12,7 @@ export interface ITaiKhoan extends Document {
     gioiTinh: "Nam" | "Nữ" | "Khác";
     ngaySinh: string;
     loaiTK: "QTV" | "NV" | "KH";
-    trangThai: string;
+    trangThai: boolean;
     sdt: string;
 }
 
@@ -27,10 +27,11 @@ export interface ISanPham extends Document {
         rong: number;
         cao: number;
     };
-    khuyenMai?: string;
+    khuyenMai?: Number;
     moTa?: string;
     danhMucId: mongoose.Types.ObjectId;
-    createdAt: Date
+    imageUrl: string;
+    createdAt: Date;
 }
 
 export interface IYeuThich extends Document {

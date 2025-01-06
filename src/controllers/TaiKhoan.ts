@@ -34,7 +34,7 @@ export const register = async (req: Request, res: Response) => {
             ten,
             userName,
             password: hashedPassword,
-            loaiTK
+            loaiTK,
         });
         res.status(200).json({ message: "Đăng ký thành công!" });
     } catch (error) {
@@ -93,7 +93,7 @@ export const login = async (req: Request, res: Response) => {
         console.log(err);
         res.status(500).json({ message: 'Lỗi hệ thống máy chủ.' });
     }
-}
+};
 
 /**
  * @description Lấy thông tin tài khoản
@@ -118,11 +118,14 @@ export const getAccount = async (req: AuthenticatedRequest, res: Response) => {
 
 /**
  * @description Cập nhật thông tin cá nhân
- * @param {Request} req - Request object 
+ * @param {Request} req - Request object
  * @param {Response} res - Response object
  * @returns message, user
  */
-export const updateAccount = async (req: AuthenticatedRequest, res: Response) => {
+export const updateAccount = async (
+    req: AuthenticatedRequest,
+    res: Response
+) => {
     const userName = req.user?.userName;
     try {
         const updatedFields = req.body;
@@ -132,25 +135,28 @@ export const updateAccount = async (req: AuthenticatedRequest, res: Response) =>
             { new: true }
         );
         res.status(200).json({
-            message: 'Cập nhật thông tin thành công!',
+            message: "Cập nhật thông tin thành công!",
             user: {
                 ...updatedUser?._doc,
-                password: undefined
-            }
+                password: undefined,
+            },
         });
     } catch (err) {
         console.log(err);
-        res.status(500).json({ message: 'Lỗi hệ thống máy chủ.' });
+        res.status(500).json({ message: "Lỗi hệ thống máy chủ." });
     }
-}
+};
 
 /**
  * @description Thêm địa chỉ của tài khoản
- * @param {Request} req - Request object 
+ * @param {Request} req - Request object
  * @param {Response} res - Response object
  * @returns message, user
  */
-export const createAddress = async (req: AuthenticatedRequest, res: Response) => {
+export const createAddress = async (
+    req: AuthenticatedRequest,
+    res: Response
+) => {
     try {
         const { userName } = req.user!;
         const { newAddress } = req.body;
@@ -158,37 +164,40 @@ export const createAddress = async (req: AuthenticatedRequest, res: Response) =>
             { userName },
             {
                 $push: {
-                    diaChi: newAddress
-                }
+                    diaChi: newAddress,
+                },
             },
             { new: true }
         );
         res.status(200).json({
-            message: 'Thêm địa chỉ thành công!',
+            message: "Thêm địa chỉ thành công!",
             user: {
                 ...updatedUser?._doc,
-                password: undefined
-            }
+                password: undefined,
+            },
         });
     } catch (err) {
         console.log(err);
-        res.status(500).json({ message: 'Lỗi hệ thống máy chủ.' });
+        res.status(500).json({ message: "Lỗi hệ thống máy chủ." });
     }
-}
+};
 
 /**
  * @description Xóa địa chỉ của tài khoản
- * @param {Request} req - Request object 
+ * @param {Request} req - Request object
  * @param {Response} res - Response object
  * @returns message, diaChi[]
  */
-export const deleteAddress = async (req: AuthenticatedRequest, res: Response) => {
+export const deleteAddress = async (
+    req: AuthenticatedRequest,
+    res: Response
+) => {
     try {
         const addressIdx = req.params.idx;
         const { userName } = req.user!;
         const user = await TaiKhoan.findOne({ userName });
         if (!user) {
-            res.status(400).json({ message: 'Tài khoản không tồn tại!' });
+            res.status(400).json({ message: "Tài khoản không tồn tại!" });
             return;
         }
         const addresses = user.diaChi;
@@ -196,28 +205,31 @@ export const deleteAddress = async (req: AuthenticatedRequest, res: Response) =>
         user.diaChi = updatedAddresses;
         await user.save();
         res.status(200).json({
-            message: 'Cập nhật địa chỉ thành công!',
-            diaChi: user?.diaChi
+            message: "Cập nhật địa chỉ thành công!",
+            diaChi: user?.diaChi,
         });
     } catch (err) {
         console.log(err);
-        res.status(500).json({ message: 'Lỗi hệ thống máy chủ.' });
+        res.status(500).json({ message: "Lỗi hệ thống máy chủ." });
     }
-}
+};
 
 /**
  * @description Đặt làm địa chỉ mặc định
- * @param {Request} req - Request object 
+ * @param {Request} req - Request object
  * @param {Response} res - Response object
  * @returns message, diaChi[]
  */
-export const setDefaultAddress = async (req: AuthenticatedRequest, res: Response) => {
+export const setDefaultAddress = async (
+    req: AuthenticatedRequest,
+    res: Response
+) => {
     try {
         const { addressIdx } = req.body;
         const { userName } = req.user!;
         const user = await TaiKhoan.findOne({ userName });
         if (!user) {
-            res.status(400).json({ message: 'Tài khoản không tồn tại!' });
+            res.status(400).json({ message: "Tài khoản không tồn tại!" });
             return;
         }
         const addresses = user.diaChi;
@@ -228,14 +240,14 @@ export const setDefaultAddress = async (req: AuthenticatedRequest, res: Response
         user.diaChi = addresses;
         await user.save();
         res.status(200).json({
-            message: 'Đặt địa chỉ mặc định thành công!',
-            diaChi: user?.diaChi
+            message: "Đặt địa chỉ mặc định thành công!",
+            diaChi: user?.diaChi,
         });
     } catch (err) {
         console.log(err);
-        res.status(500).json({ message: 'Lỗi hệ thống máy chủ.' });
+        res.status(500).json({ message: "Lỗi hệ thống máy chủ." });
     }
-}
+};
 
 /**
  * @description Đổi mật khẩu tài khoản
@@ -243,31 +255,34 @@ export const setDefaultAddress = async (req: AuthenticatedRequest, res: Response
  * @param {Response} res - Response object
  * @returns message
  */
-export const changePassword = async (req: AuthenticatedRequest, res: Response) => {
+export const changePassword = async (
+    req: AuthenticatedRequest,
+    res: Response
+) => {
     try {
         const { oldPassword, newPassword } = req.body;
         const { userName } = req.user!;
         const user = await TaiKhoan.findOne({ userName });
         if (!user) {
-            res.status(400).json({ message: 'Tài khoản không tồn tại!' });
+            res.status(400).json({ message: "Tài khoản không tồn tại!" });
             return;
         }
         // Ktra mật khẩu cũ có khớp không?
         const isMatch = await bcrypt.compare(oldPassword, user.password);
         if (!isMatch) {
-            res.status(400).json({ message: 'Mật khẩu cũ không đúng!' });
+            res.status(400).json({ message: "Mật khẩu cũ không đúng!" });
             return;
         }
         // Mã hóa mật khẩu mới
         const hashedPassword = await bcrypt.hash(newPassword, 10);
         user.password = hashedPassword;
         await user.save();
-        res.status(200).json({ message: 'Đổi mật khẩu thành công!' });
+        res.status(200).json({ message: "Đổi mật khẩu thành công!" });
     } catch (err) {
         console.log(err);
-        res.status(500).json({ message: 'Lỗi hệ thống máy chủ.' });
+        res.status(500).json({ message: "Lỗi hệ thống máy chủ." });
     }
-}
+};
 
 //--------------------------------------------------------//
 
@@ -365,19 +380,14 @@ export const search = async (req: Request, res: Response) => {
 export const lock = async (req: Request, res: Response) => {
     try {
         const { userId } = req.params;
-        const { trangThai } = req.body;
 
         if (!mongoose.Types.ObjectId.isValid(userId)) {
             return res.status(400).json({
                 message: "ID người dùng không hợp lệ!",
             });
         }
-
-        const taiKhoan = await TaiKhoan.findByIdAndUpdate(
-            userId,
-            { trangThai: trangThai },
-            { new: true }
-        );
+        // Tìm tài khoản để lấy trạng thái hiện tại
+        const taiKhoan = await TaiKhoan.findById(userId);
 
         if (!taiKhoan) {
             return res.status(404).json({
@@ -385,9 +395,17 @@ export const lock = async (req: Request, res: Response) => {
             });
         }
 
+        // Đảo ngược trạng thái hiện tại
+        const trangThaiMoi = !taiKhoan.trangThai;
+
+        // Cập nhật trạng thái mới
+        taiKhoan.trangThai = trangThaiMoi;
+        await taiKhoan.save();
+
         res.status(200).json({
-            message: `Tài khoản đã được ${trangThai ? "mở khóa" : "khóa"
+            message: `Tài khoản đã được ${trangThaiMoi ? "mở khóa" : "khóa"
                 } thành công!`,
+            data: { userId, trangThai: trangThaiMoi },
         });
     } catch (error) {
         res.status(500).json({

@@ -43,14 +43,14 @@ const SanPhamSchema: Schema = new Schema(
         moTa: {
             type: String
         },
-        imageURL: {
-            type: String
-        },
         danhMucId: {
             type: Schema.Types.ObjectId,
             ref: "DanhMuc",
             required: true
         },
+        imageUrl: {
+            type: String
+        }
     },
     {
         timestamps: true,

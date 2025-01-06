@@ -84,11 +84,11 @@ router.get("/getEmployees", getEmployees);
  * @route       GET '/api/account/search'
  * @description Tìm kiếm tài khoản
  */
-router.post("/search", search);
+router.get("/search", search);
 
 /**
  * @route       PATCH '/api/account/:userId/lock'
- * @description LKhoá tài khoản
+ * @description Khoá tài khoản
  */
 router.patch("/:userId/lockAccount", lock);
 

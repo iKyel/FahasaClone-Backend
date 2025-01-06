@@ -2,6 +2,7 @@ import express from "express";
 import {
     register,
     login,
+    getAccount,
     updateAccount,
     createAddress,
     deleteAddress,
@@ -28,6 +29,12 @@ router.post("/register", register);
  * @description Đăng nhập vào tài khoản
  */
 router.post("/login", login);
+
+/**
+ * @route       GET '/api/account/getAccount'
+ * @description Lấy thông tin tài khoản
+ */
+router.get('/getAccount', verifyToken, getAccount);
 
 /**
  * @route       PUT '/api/account/updateAccount'

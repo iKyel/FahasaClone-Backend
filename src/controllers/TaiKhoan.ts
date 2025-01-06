@@ -50,7 +50,7 @@ export const register = async (req: Request, res: Response) => {
  * @returns message, user
  */
 export const login = async (req: Request, res: Response) => {
-    const { userName, password } = req.body;
+    const { userName, password, loaiTK } = req.body;
     try {
         // Ktra userName có tồn tại không?
         const user = await TaiKhoan.findOne({ userName });
@@ -58,37 +58,58 @@ export const login = async (req: Request, res: Response) => {
             // Ktra password có khớp không?
             const isMatch = await bcrypt.compare(password, user.password);
             if (isMatch) {
-                // Nếu khớp, tạo token và gửi về client qua cookie
-                const token = jwt.sign(
-                    {
-                        userId: user._id,
-                        userName: user.userName
-                    },
-                    SECRET_KEY,
-                    {
-                        expiresIn: '1d'
-                    }
-                );
-                res.cookie('token', token, {
-                    httpOnly: true,
-                    secure: false,
-                    maxAge: 24 * 60 * 60 * 1000     // 1 day in milliseconds
-                });
-                res.status(200).json({
-                    message: 'Đăng nhập thành công!',
-                    user: {
-                        _id: user._id,
-                        hoDem: user.hoDem,
-                        ten: user.ten,
-                        userName: user.userName,
-                        loaiTk: user.loaiTK
-                    }
-                });
-                return;
+                // Ktra loaiTK có khớp với trong csdl?
+                if (loaiTK === user.loaiTK) {
+                    // Nếu khớp, tạo token và gửi về client qua cookie
+                    const token = jwt.sign(
+                        {
+                            userId: user._id,
+                            userName: user.userName
+                        },
+                        SECRET_KEY,
+                        {
+                            expiresIn: '1d'
+                        }
+                    );
+                    res.cookie('token', token, {
+                        httpOnly: true,
+                        secure: false,
+                        maxAge: 24 * 60 * 60 * 1000     // 1 day in milliseconds
+                    });
+                    res.status(200).json({
+                        message: 'Đăng nhập thành công!',
+                        user: {
+                            ...user._doc,
+                            password: undefined
+                        }
+                    });
+                    return;
+                }
             }
         }
         // UserName hoặc password ko đúng
         res.status(400).json({ message: 'Tên đăng nhập hoặc mật khẩu không đúng!' });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ message: 'Lỗi hệ thống máy chủ.' });
+    }
+}
+
+/**
+ * @description Lấy thông tin tài khoản
+ * @param {Request} req - Request object
+ * @param {Response} res - Response object
+ * @returns message, user
+ */
+export const getAccount = async (req: AuthenticatedRequest, res: Response) => {
+    const userName = req.user?.userName;
+    try {
+        const user = await TaiKhoan.findOne({ userName })
+            .select("-password");
+        res.status(200).json({
+            message: 'Lấy thông tin thành công!',
+            user
+        });
     } catch (err) {
         console.log(err);
         res.status(500).json({ message: 'Lỗi hệ thống máy chủ.' });

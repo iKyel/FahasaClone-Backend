@@ -38,9 +38,12 @@ const SanPhamSchema: Schema = new Schema(
             },
         },
         khuyenMai: {
-            type: String,
+            type: Number,
         },
         moTa: {
+            type: String
+        },
+        imageURL: {
             type: String
         },
         danhMucId: {

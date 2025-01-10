@@ -10,9 +10,6 @@ const DacTrungSchema: Schema = new Schema(
         tenTruyVan: {
             type: String,
             require: true
-        },
-        dsGiaTri: {
-            type: Array,
         }
     }
 );

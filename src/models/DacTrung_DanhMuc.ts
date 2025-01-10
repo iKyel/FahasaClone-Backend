@@ -12,6 +12,9 @@ const DacTrung_DanhMucSchema: Schema = new Schema(
             type: Schema.Types.ObjectId,
             ref: "DacTrung",
             required: true
+        },
+        dsGiaTri: {
+            type: Array,
         }
     }
 );

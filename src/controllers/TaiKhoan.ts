@@ -319,8 +319,7 @@ export const getCustomers = async (req: Request, res: Response) => {
 export const getEmployees = async (req: Request, res: Response) => {
     try {
         const taiKhoanNV = await TaiKhoan.find({
-            loaiTK: "NV",
-            trangThai: true,
+            loaiTK: "NV"
         }).select("-password");
 
         res.status(200).json({

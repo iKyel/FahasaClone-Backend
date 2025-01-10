@@ -56,12 +56,12 @@ export interface IDanhMuc extends Document {
 export interface IDacTrung extends Document {
   ten: string;
   tenTruyVan: string;
-  dsGiaTri: Array<string>;
 }
 
 export interface IDacTrung_DanhMuc extends Document {
   danhMucId: mongoose.Types.ObjectId;
   dacTrungId: mongoose.Types.ObjectId;
+  dsGiaTri: Array<string>;
 }
 
 export interface IDacTrung_SanPham extends Document {

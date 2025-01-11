@@ -13,10 +13,9 @@ const DacTrung_DanhMucSchema: Schema = new Schema(
             ref: "DacTrung",
             required: true
         },
-        giaTri: {
-            type: String,
-            required: true
-        },
+        dsGiaTri: {
+            type: Array,
+        }
     }
 );
 

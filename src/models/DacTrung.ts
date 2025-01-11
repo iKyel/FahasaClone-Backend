@@ -7,6 +7,10 @@ const DacTrungSchema: Schema = new Schema(
             type: String,
             require: true
         },
+        tenTruyVan: {
+            type: String,
+            require: true
+        },
     }
 );
 

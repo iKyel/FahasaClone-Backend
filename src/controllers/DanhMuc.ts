@@ -28,7 +28,7 @@ export const getCategories = async (req: Request, res: Response) => {
     const x = await DanhMuc.find().lean(); // Sử dụng `lean()` để nhận kết quả dạng plain object
 
     // Chuyển đổi dữ liệu để trả về theo yêu cầu
-    const danhMucs = x.map((danhMuc) => ({
+    const categories = x.map((danhMuc) => ({
       _id: danhMuc._id,
       ten: danhMuc.ten,
       parentId: danhMuc.parentId ? danhMuc.parentId.toString() : null, // Nếu không có parentId, trả về null
@@ -36,7 +36,7 @@ export const getCategories = async (req: Request, res: Response) => {
 
     res
       .status(200)
-      .json({ danhMucs, message: "Lấy danh mục thành công!" });
+      .json({ categories, message: "Lấy danh mục thành công!" });
   } catch (error) {
     res
       .status(500)
@@ -55,7 +55,7 @@ export const getCategoryName = async (req: Request, res: Response) => {
     }
 
     res.status(200).json({
-      category: { _id: danhMuc._id, tenDM: danhMuc.ten },
+      category: { _id: danhMuc._id, ten: danhMuc.ten },
       message: "Lấy thông tin danh mục thành công.",
     });
   } catch (error) {

@@ -39,9 +39,11 @@ const SanPhamSchema: Schema = new Schema(
         },
         khuyenMai: {
             type: Number,
+            default: 0
         },
         moTa: {
-            type: String
+            type: String,
+            default: 'Không có mô tả.',
         },
         danhMucId: {
             type: Schema.Types.ObjectId,
@@ -49,7 +51,8 @@ const SanPhamSchema: Schema = new Schema(
             required: true
         },
         imageUrl: {
-            type: String
+            type: String,
+            default: ''
         }
     },
     {

@@ -17,7 +17,7 @@ const ITEMS_PER_PAGE = 24;
 export const createProduct = async (req: Request, res: Response) => {
     try {
         const sanPham: ISanPham = req.body;
-        const features: Array<{ _id: string, tenDT: string, giaTri: string }> = req.body.features;
+        const features: Array<{ _id: string, ten: string, giaTri: string }> = req.body.features;
         // Thêm sản phẩm vào bảng SanPham
         const sanPhamInDB = await SanPham.create(sanPham);
         // Thêm các đặc trưng của sản phẩm vào bảng DacTrung_SanPham
@@ -43,7 +43,7 @@ export const updateProduct = async (req: Request, res: Response) => {
     try {
         const productId = req.params.id;
         const sanPham: ISanPham = req.body;
-        const dacTrungSPs: Array<{ _id: string, tenDT: string, giaTri: string }> = req.body.features;
+        const dacTrungSPs: Array<{ _id: string, ten: string, giaTri: string }> = req.body.features;
         // Cập nhật thông tin sản phẩm
         await SanPham.findByIdAndUpdate(productId, sanPham);
         // Cập nhật các đặc trưng của sản phẩm
@@ -255,7 +255,7 @@ export const getProductDetail = async (req: Request, res: Response) => {
             .map(dacTrungSP => ({
                 _id: dacTrungSP._id,
                 dacTrungId: dacTrungSP.dacTrungId._id,
-                tenDT: (dacTrungSP.dacTrungId as unknown as IDacTrung).ten,
+                ten: (dacTrungSP.dacTrungId as unknown as IDacTrung).ten,
                 giaTri: dacTrungSP.giaTri
             }));
         res.status(200).json({

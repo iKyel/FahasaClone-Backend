@@ -5,6 +5,9 @@ import DacTrung_SanPham from '../models/DacTrung_SanPham';
 import DacTrung from '../models/DacTrung';
 import HoaDonNhap from '../models/HoaDonNhap';
 import ChiTietHDN from '../models/ChiTietHDN';
+import { ObjectId } from 'mongodb';
+import path from 'path';
+import NhaCungCap from '../models/NhaCungCap';
 
 const ITEMS_PER_PAGE = 24;
 
@@ -124,7 +127,9 @@ export const getProducts = async (req: Request, res: Response) => {
         let sanPhamIdsByNhaCC: Array<string> = [];
         if (supplier) {
             sanPhamIdsByNhaCC = (await HoaDonNhap.aggregate()
-                .match({ nhaCungCapId: supplier })
+                .match({ 
+                    nhaCungCapId: new ObjectId(supplier)
+                })
                 .lookup({
                     from: 'ChiTietHDNs',
                     localField: '_id',
@@ -258,12 +263,35 @@ export const getProductDetail = async (req: Request, res: Response) => {
                 ten: (dacTrungSP.dacTrungId as unknown as IDacTrung).ten,
                 giaTri: dacTrungSP.giaTri
             }));
+        // Lấy nhà cung cấp của sản phẩm
+        const suppliers = (await ChiTietHDN
+            .aggregate()
+            .match({
+                sanPhamId: new ObjectId(productId),
+            })
+            .lookup({
+                from: 'HoaDonNhaps',
+                localField: 'hoaDonNhapId',
+                foreignField: '_id',
+                as: 'hoaDonNhap'
+            })
+            .unwind('$hoaDonNhap')
+            .lookup({
+                from: 'NhaCungCaps',
+                localField: 'hoaDonNhap.nhaCungCapId',
+                foreignField: '_id',
+                as: 'nhaCungCap'
+            })
+            .unwind('$nhaCungCap'))
+            .map(item => ({
+                _id: item.nhaCungCap._id,
+                ten: item.nhaCungCap.ten,
+            }));
         res.status(200).json({
             message: 'Lấy thông tin chi tiết sản phẩm thành công!',
-            productDetail: {
-                ...product.toObject(),
-                features
-            },
+            productDetail: product,
+            features,
+            supplier: suppliers[0]
         });
     } catch (err) {
         console.log(err);

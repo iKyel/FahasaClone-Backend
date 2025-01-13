@@ -2,6 +2,7 @@ import express from "express";
 import {
     register,
     login,
+    logout,
     getAccount,
     updateAccount,
     createAddress,
@@ -14,6 +15,7 @@ import {
     lock,
 } from "../controllers/TaiKhoan";
 import verifyToken from "../middlewares/verifyToken";
+import { checkRoleAdmin } from "../middlewares/authorizedUser";
 
 const router = express.Router();
 
@@ -28,6 +30,12 @@ router.post("/register", register);
  * @description Đăng nhập vào tài khoản
  */
 router.post("/login", login);
+
+/**
+ * @route       GET '/api/account/logout'
+ * @description Đăng xuất khỏi tài khoản
+ */
+router.get("/logout", verifyToken, logout);
 
 /**
  * @route       GET '/api/account/getAccount'
@@ -71,13 +79,13 @@ router.put('/changePassword', verifyToken, changePassword);
  * @route       GET '/api/account/getCustomers'
  * @description Lấy danh sách tài khoản khách hàng
  */
-router.get("/getCustomers", getCustomers);
+router.get("/getCustomers", verifyToken, getCustomers);
 
 /**
  * @route       GET '/api/account/getEmployees'
  * @description Lấy danh sách tài khoản nhân viên
  */
-router.get("/getEmployees", getEmployees);
+router.get("/getEmployees", verifyToken, checkRoleAdmin, getEmployees);
 
 /**
  * @route       GET '/api/account/search'
@@ -89,7 +97,7 @@ router.get("/search", search);
  * @route       PATCH '/api/account/:userId/lock'
  * @description Khoá tài khoản
  */
-router.patch("/:userId/lockAccount", lock);
+router.patch("/:userId/lockAccount", verifyToken, checkRoleAdmin, lock);
 
 
 export default router;

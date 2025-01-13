@@ -5,6 +5,9 @@ import DacTrung_SanPham from '../models/DacTrung_SanPham';
 import DacTrung from '../models/DacTrung';
 import HoaDonNhap from '../models/HoaDonNhap';
 import ChiTietHDN from '../models/ChiTietHDN';
+import { ObjectId } from 'mongodb';
+import path from 'path';
+import NhaCungCap from '../models/NhaCungCap';
 
 const ITEMS_PER_PAGE = 24;
 
@@ -17,7 +20,7 @@ const ITEMS_PER_PAGE = 24;
 export const createProduct = async (req: Request, res: Response) => {
     try {
         const sanPham: ISanPham = req.body;
-        const features: Array<{ _id: string, tenDT: string, giaTri: string }> = req.body.features;
+        const features: Array<{ _id: string, ten: string, giaTri: string }> = req.body.features;
         // Thêm sản phẩm vào bảng SanPham
         const sanPhamInDB = await SanPham.create(sanPham);
         // Thêm các đặc trưng của sản phẩm vào bảng DacTrung_SanPham
@@ -43,7 +46,7 @@ export const updateProduct = async (req: Request, res: Response) => {
     try {
         const productId = req.params.id;
         const sanPham: ISanPham = req.body;
-        const dacTrungSPs: Array<{ _id: string, tenDT: string, giaTri: string }> = req.body.features;
+        const dacTrungSPs: Array<{ _id: string, ten: string, giaTri: string }> = req.body.features;
         // Cập nhật thông tin sản phẩm
         await SanPham.findByIdAndUpdate(productId, sanPham);
         // Cập nhật các đặc trưng của sản phẩm
@@ -124,7 +127,9 @@ export const getProducts = async (req: Request, res: Response) => {
         let sanPhamIdsByNhaCC: Array<string> = [];
         if (supplier) {
             sanPhamIdsByNhaCC = (await HoaDonNhap.aggregate()
-                .match({ nhaCungCapId: supplier })
+                .match({ 
+                    nhaCungCapId: new ObjectId(supplier)
+                })
                 .lookup({
                     from: 'ChiTietHDNs',
                     localField: '_id',
@@ -255,15 +260,38 @@ export const getProductDetail = async (req: Request, res: Response) => {
             .map(dacTrungSP => ({
                 _id: dacTrungSP._id,
                 dacTrungId: dacTrungSP.dacTrungId._id,
-                tenDT: (dacTrungSP.dacTrungId as unknown as IDacTrung).ten,
+                ten: (dacTrungSP.dacTrungId as unknown as IDacTrung).ten,
                 giaTri: dacTrungSP.giaTri
+            }));
+        // Lấy nhà cung cấp của sản phẩm
+        const suppliers = (await ChiTietHDN
+            .aggregate()
+            .match({
+                sanPhamId: new ObjectId(productId),
+            })
+            .lookup({
+                from: 'HoaDonNhaps',
+                localField: 'hoaDonNhapId',
+                foreignField: '_id',
+                as: 'hoaDonNhap'
+            })
+            .unwind('$hoaDonNhap')
+            .lookup({
+                from: 'NhaCungCaps',
+                localField: 'hoaDonNhap.nhaCungCapId',
+                foreignField: '_id',
+                as: 'nhaCungCap'
+            })
+            .unwind('$nhaCungCap'))
+            .map(item => ({
+                _id: item.nhaCungCap._id,
+                ten: item.nhaCungCap.ten,
             }));
         res.status(200).json({
             message: 'Lấy thông tin chi tiết sản phẩm thành công!',
-            productDetail: {
-                ...product.toObject(),
-                features
-            },
+            productDetail: product,
+            features,
+            supplier: suppliers[0]
         });
     } catch (err) {
         console.log(err);

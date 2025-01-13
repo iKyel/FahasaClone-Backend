@@ -6,6 +6,8 @@ import {
     getProducts,
     getProductDetail
 } from '../controllers/SanPham';
+import verifyToken from '../middlewares/verifyToken';
+import { checkRoleStaff } from '../middlewares/authorizedUser';
 
 const router = express.Router();
 
@@ -13,14 +15,14 @@ const router = express.Router();
  * @route       POST '/api/product/createProduct'
  * @description Tạo sản phẩm mới
  */
-router.post("/createProduct", createProduct);
+router.post("/createProduct", verifyToken, checkRoleStaff, createProduct);
 
 /**
  * @route       PUT '/api/product/updateProduct/:id'
  * @description Cập nhật thông tin sản phẩm
  * @param       id
  */
-router.put("/updateProduct/:id", updateProduct);
+router.put("/updateProduct/:id", verifyToken, checkRoleStaff, updateProduct);
 
 /**
  * @route       GET '/api/product/searchProduct'

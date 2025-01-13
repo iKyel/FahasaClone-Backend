@@ -96,6 +96,17 @@ export const login = async (req: Request, res: Response) => {
 };
 
 /**
+ * @description Đăng xuất khỏi tài khoản
+ * @param {AuthenticatedRequest} req - Request object
+ * @param {Response} res - Response object
+ * @returns message
+ */
+export const logout = async (req: AuthenticatedRequest, res: Response) => {
+    res.clearCookie('token');
+    res.status(200).json({ message: 'Đăng xuất thành công!' });
+};
+
+/**
  * @description Lấy thông tin tài khoản
  * @param {Request} req - Request object
  * @param {Response} res - Response object

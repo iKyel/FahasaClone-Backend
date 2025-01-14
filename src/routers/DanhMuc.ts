@@ -6,6 +6,7 @@ import {
     addFeaturesToCategory,
     getFeaturesByCategory,
 } from "../controllers/DanhMuc";
+import { checkRoleStaff } from "../middlewares/authorizedUser";
 
 const router = express.Router();
 
@@ -31,7 +32,7 @@ router.get("/getCategoryName/:danhMucId", getCategoryName);
  * @route       PUT /api/danhMuc/addFeaturesToCategory
  * @desc        Add features to a specific category
  */
-router.put("/addFeaturesToCategory", addFeaturesToCategory);
+router.put("/addFeaturesToCategory", checkRoleStaff, addFeaturesToCategory);
 
 /**
  * @route       GET /api/danhMuc/getFeaturesByCategory/:danhMucId

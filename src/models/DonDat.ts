@@ -6,7 +6,6 @@ const DonDatSchema: Schema = new Schema(
         nhanVienId: {
             type: Schema.Types.ObjectId,
             ref: "TaiKhoan",
-            required: true,
         },
         khachHangId: {
             type: Schema.Types.ObjectId,
@@ -16,19 +15,20 @@ const DonDatSchema: Schema = new Schema(
         trangThaiDon: {
             type: String,
             enum: [
+                "Giỏ hàng",
                 "Chờ xác nhận",
                 "Đã xác nhận",
                 "Đã giao hàng",
                 "Hoàn thành",
                 "Đã huỷ",
             ],
-            default: "Chờ xác nhận",
+            default: "Giỏ hàng",
         },
         ptVanChuyen: {
             type: String,
             enum: [
                 "Giao hàng tiết kiệm",
-                " Giao hàng nhanh",
+                "Giao hàng nhanh",
                 "Giao hàng tiêu chuẩn"
             ],
             default: "Giao hàng tiêu chuẩn",

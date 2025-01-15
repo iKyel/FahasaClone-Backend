@@ -8,6 +8,7 @@ import ChiTietHDN from '../models/ChiTietHDN';
 import { ObjectId } from 'mongodb';
 import path from 'path';
 import NhaCungCap from '../models/NhaCungCap';
+import DanhMuc from '../models/DanhMuc';
 
 const ITEMS_PER_PAGE = 24;
 
@@ -100,7 +101,7 @@ export const searchProduct = async (req: Request, res: Response) => {
  * @param {Request} req - Request object
  * @param {Response} res - Response object
  * @query danhMucId, dacTrung_sanPhamId, nhaCungCapId, price, orderBy, pageNum
- * @returns message, products
+ * @returns message, products, totalPage, features, suppliers
  */
 export const getProducts = async (req: Request, res: Response) => {
     try {
@@ -118,7 +119,18 @@ export const getProducts = async (req: Request, res: Response) => {
 
         // Lọc sản phẩm theo danh mục
         if (category) {
-            filter.danhMucId = category;
+            let arrayA: Array<string> = []; // Mảng chứa tất cả danh mục thỏa mãn
+            let arrayB: Array<string> = []; // Mảng chứa các danh mục cha
+            // Lấy 'danhMucId', cho vào mảng 'A'
+            arrayA.push(category);
+            arrayB.push(category);
+            // Lấy các danh mục con có 'parentId': 'danhMucId' --> mảng 'B', cho vào mảng 'A'
+            while (arrayB.length > 0) {
+                arrayB = (await DanhMuc.find({ parentId: { $in: arrayB } }))
+                    .map(danhMuc => danhMuc._id.toString());
+                arrayA = arrayA.concat(arrayB);
+            }
+            filter.danhMucId = { $in: arrayA };
         }
 
         // Lọc sản phẩm theo nhà cung cấp và đặc trưng
@@ -127,7 +139,7 @@ export const getProducts = async (req: Request, res: Response) => {
         let sanPhamIdsByNhaCC: Array<string> = [];
         if (supplier) {
             sanPhamIdsByNhaCC = (await HoaDonNhap.aggregate()
-                .match({ 
+                .match({
                     nhaCungCapId: new ObjectId(supplier)
                 })
                 .lookup({
@@ -183,7 +195,7 @@ export const getProducts = async (req: Request, res: Response) => {
 
         // Lọc sản phẩm theo giá
         if (price) {
-            const [minPrice, maxPrice] = price.split('-').map(Number);
+            const [minPrice, maxPrice] = price.split(':').map(Number);
             filter.giaBan = {
                 $gte: minPrice,
                 $lte: maxPrice
@@ -228,7 +240,61 @@ export const getProducts = async (req: Request, res: Response) => {
             res.status(404).json({ message: 'Không tìm thấy sản phẩm nào.' });
             return;
         }
-        res.status(200).json({ message: 'Lấy danh sách sản phẩm thành công.', products, totalPage });
+
+        const productIds = products.map(product => product._id);
+        // Lấy các đặc trưng và danh sách giá trị của đặc trưng đó dựa trên bảng DacTrung_SanPham
+        const features = await DacTrung_SanPham.aggregate()
+            .match({
+                sanPhamId: { $in: productIds }
+            })
+            .lookup({
+                from: 'DacTrungs',
+                localField: 'dacTrungId',
+                foreignField: '_id',
+                as: 'dacTrung'
+            })
+            .unwind('$dacTrung')
+            .match({
+                'dacTrung.truongLoc': true
+            })
+            .group({
+                _id: '$dacTrungId',
+                ten: { $first: '$dacTrung.ten' },
+                dsGiaTri: { $addToSet: '$giaTri' },
+                tenTruyVan: { $first: '$dacTrung.tenTruyVan' }
+            })
+
+        // Lấy các nhà cung cấp thông qua bảng HoaDonNhap và ChiTietHDN
+        const suppliers = await ChiTietHDN.aggregate()
+            .match({
+                sanPhamId: { $in: productIds }
+            })
+            .lookup({
+                from: 'HoaDonNhaps',
+                localField: 'hoaDonNhapId',
+                foreignField: '_id',
+                as: 'hoaDonNhap'
+            })
+            .unwind('$hoaDonNhap')
+            .lookup({
+                from: 'NhaCungCaps',
+                localField: 'hoaDonNhap.nhaCungCapId',
+                foreignField: '_id',
+                as: 'nhaCungCap'
+            })
+            .unwind('$nhaCungCap')
+            .group({
+                _id: '$nhaCungCap._id',
+                ten: { $first: '$nhaCungCap.ten' }
+            })
+
+        res.status(200).json({
+            message: 'Lấy danh sách sản phẩm thành công.',
+            products,
+            totalPage,
+            features,
+            suppliers
+        });
     } catch (err) {
         console.log(err);
         res.status(500).json({ message: 'Lỗi hệ thống máy chủ.' });

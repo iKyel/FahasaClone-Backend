@@ -3,8 +3,6 @@ import {
     addCategory,
     getCategories,
     getCategoryName,
-    addFeaturesToCategory,
-    getFeaturesByCategory,
 } from "../controllers/DanhMuc";
 
 const router = express.Router();
@@ -26,17 +24,5 @@ router.get("/getCategories", getCategories);
  * @desc        Retrieve the name of a category by its ID
  */
 router.get("/getCategoryName/:danhMucId", getCategoryName);
-
-/**
- * @route       PUT /api/danhMuc/addFeaturesToCategory
- * @desc        Add features to a specific category
- */
-router.put("/addFeaturesToCategory", addFeaturesToCategory);
-
-/**
- * @route       GET /api/danhMuc/getFeaturesByCategory/:danhMucId
- * @desc        Retrieve features of a specific category by its ID
- */
-router.get("/getFeaturesByCategory/:danhMucId", getFeaturesByCategory);
 
 export default router;

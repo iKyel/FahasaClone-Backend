@@ -17,7 +17,7 @@ const SanPhamSchema: Schema = new Schema(
         },
         soLuong: {
             type: Number,
-            required: true
+            default: 0
         },
         trongLuong: {
             type: Number,

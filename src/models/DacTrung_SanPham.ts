@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import { IDacTrung_DanhMuc, IDacTrung_SanPham } from "../interface/ModelInterface";
+import { IDacTrung_SanPham } from "../interface/ModelInterface";
 
 const DacTrung_SanPhamSchema: Schema = new Schema(
     {

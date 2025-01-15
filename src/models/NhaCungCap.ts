@@ -6,11 +6,6 @@ const NhaCungCapSchema = new Schema<INhaCungCap>({
         type: String,
         required: true
     },
-    danhMucId: {
-        type: Schema.Types.ObjectId,
-        ref: "DanhMuc",
-        required: true
-    },
 });
 
 export default mongoose.model<INhaCungCap>("NhaCungCap", NhaCungCapSchema, "NhaCungCaps");

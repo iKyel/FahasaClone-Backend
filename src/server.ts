@@ -12,8 +12,11 @@ import connectDB from "./connection/db";
 
 // Routes
 import taiKhoanRouter from "./routers/TaiKhoan";
+import categoryRouter from "./routers/DanhMuc";
 import sanPhamRouter from "./routers/SanPham";
 import donDatRouter from "./routers/DonDat";
+import nhaCungCapRouter from "./routers/NhaCungCap";
+
 
 dotenv.config(); // Load các biến môi trường từ file .env
 
@@ -34,8 +37,10 @@ app.use(express.json());    // phân tích dữ liệu JSON
 
 // route
 app.use('/api/account', taiKhoanRouter);
+app.use('/api/category', categoryRouter);
 app.use('/api/product', sanPhamRouter);
 app.use('/api/order', donDatRouter);
+app.use('/api/supplier', nhaCungCapRouter);
 
 app.get('/', (req: Request, res: Response) => {
     res.status(200).json("Hello world");

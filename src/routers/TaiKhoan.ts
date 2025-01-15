@@ -9,14 +9,13 @@ import {
     deleteAddress,
     setDefaultAddress,
     changePassword,
-    
     getCustomers,
     getEmployees,
     search,
     lock,
 } from "../controllers/TaiKhoan";
 import verifyToken from "../middlewares/verifyToken";
-import { checkRoleAdmin } from "../middlewares/authorizedUser";
+import { checkRoleAdmin, checkRoleStaff } from "../middlewares/authorizedUser";
 
 const router = express.Router();
 
@@ -80,7 +79,7 @@ router.put('/changePassword', verifyToken, changePassword);
  * @route       GET '/api/account/getCustomers'
  * @description Lấy danh sách tài khoản khách hàng
  */
-router.get("/getCustomers", verifyToken, getCustomers);
+router.get("/getCustomers", verifyToken, checkRoleStaff, getCustomers);
 
 /**
  * @route       GET '/api/account/getEmployees'

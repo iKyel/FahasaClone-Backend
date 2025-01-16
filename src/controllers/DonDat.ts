@@ -171,10 +171,11 @@ export const updateCart = async (req: AuthenticatedRequest, res: Response) => {
       cartDetail: await Promise.all(
         updatedCartDetails.map(async (detail) => {
           const sanPham = await SanPham.findById(detail.sanPhamId).select(
-            "tenSP giaBan"
+            "_id tenSP giaBan"
           );
           return {
             _id: detail._id,
+            sanPhamId: sanPham?._id,
             giaBan: sanPham?.giaBan || 0,
             tenSP: sanPham?.tenSP || "Không xác định",
             soLuong: detail.soLuong,
@@ -253,6 +254,7 @@ export const removeProduct = async (req: AuthenticatedRequest, res: Response) =>
                   );
                   return {
                     _id: detail._id,
+                    sanPhamId: sanPham?._id,
                     giaBan: sanPham?.giaBan || 0,
                     tenSP: sanPham?.tenSP || "Không xác định",
                     soLuong: detail.soLuong,

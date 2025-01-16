@@ -235,7 +235,7 @@ export const updateCart = async (req: AuthenticatedRequest, res: Response) => {
       return item.daChon ? total + item.thanhTien : total;
     }, 0);
 
-    cart.tongTien = tongTien;
+    cart.tongTien = Math.round(tongTien);
     await cart.save();
 
     // Lấy cartDetail của người dùng sau khi cập nhật
@@ -296,7 +296,7 @@ export const removeProduct = async (
       }, 0);
 
       // Cập nhật tổng tiền trong giỏ hàng
-      cart.tongTien = tongTien;
+      cart.tongTien = Math.round(tongTien);
       await cart.save(); // Lưu giỏ hàng với tổng tiền mới
     }
 

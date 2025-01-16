@@ -13,8 +13,22 @@ const HoaDonNhapSchema: Schema = new Schema(
             ref: "TaiKhoan",
             required: true,
         },
+        trangThaiDon: {
+            type: String,
+            enum: [
+                "Chờ xác nhận", 
+                "Hoàn thành",
+                "Đã hủy"
+            ],
+            default: "Chờ xác nhận",
+        },
+        ghiChu: {
+            type: String,
+            default: "",
+        },
         tongTien: {
-            type: Number
+            type: Number,
+            default: 0,
         }
     },
     {

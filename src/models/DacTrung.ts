@@ -7,6 +7,10 @@ const DacTrungSchema: Schema = new Schema(
             type: String,
             require: true
         },
+        truongLoc: {
+            type: Boolean,
+            default: true
+        },
         tenTruyVan: {
             type: String,
             require: true

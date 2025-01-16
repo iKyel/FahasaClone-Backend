@@ -2,9 +2,7 @@ import express from "express";
 import {
     addCategory,
     getCategories,
-    getCategoryName,
-    addFeaturesToCategory,
-    getFeaturesByCategory,
+    getCategoryName
 } from "../controllers/DanhMuc";
 import { checkRoleStaff } from "../middlewares/authorizedUser";
 
@@ -28,16 +26,5 @@ router.get("/getCategories", getCategories);
  */
 router.get("/getCategoryName/:danhMucId", getCategoryName);
 
-/**
- * @route       PUT /api/danhMuc/addFeaturesToCategory
- * @desc        Add features to a specific category
- */
-router.put("/addFeaturesToCategory", checkRoleStaff, addFeaturesToCategory);
-
-/**
- * @route       GET /api/danhMuc/getFeaturesByCategory/:danhMucId
- * @desc        Retrieve features of a specific category by its ID
- */
-router.get("/getFeaturesByCategory/:danhMucId", getFeaturesByCategory);
 
 export default router;

@@ -195,7 +195,7 @@ export const getProducts = async (req: Request, res: Response) => {
 
         // Lọc sản phẩm theo giá
         if (price) {
-            const [minPrice, maxPrice] = price.split(':').map(Number);
+            const [minPrice, maxPrice] = price.split('-').map(Number);
             filter.giaBan = {
                 $gte: minPrice,
                 $lte: maxPrice

@@ -33,14 +33,16 @@ export async function getUserCartDetail(cartId: mongoose.Types.ObjectId) {
         })
         .unwind('$sanPham'))
         .map(item => ({
-            _id: item.sanPham._id,
+            _id: item._id,
+            sanPhamId: item.sanPham._id,
             tenSP: item.sanPham.tenSP,
             giaBan: item.sanPham.giaBan,
             khuyenMai: item.sanPham.khuyenMai,
             soLuongTon: item.sanPham.soLuong,
             imageUrl: item.sanPham.imageUrl,
             soLuong: item.soLuong,
-            thanhTien: item.thanhTien
+            thanhTien: item.thanhTien,
+            daChon: item.daChon
         }))
     return cartDetail;
 }

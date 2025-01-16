@@ -3,7 +3,8 @@ import verifyToken from '../middlewares/verifyToken';
 import { checkRoleCustomer } from '../middlewares/authorizedUser';
 import { 
     getCart,
-    addToCart 
+    addToCart,
+    selectProductInCart
 } from '../controllers/DonDat';
 
 const router = express.Router();
@@ -19,5 +20,12 @@ router.get("/getCart", verifyToken, checkRoleCustomer, getCart);
  * @description Thêm sản phẩm vào giỏ hàng
  */
 router.post("/addToCart", verifyToken, checkRoleCustomer, addToCart);
+
+/**
+ * @route       PATCH '/api/order/selectProductInCart'
+ * @description Chọn sản phẩm trong giỏ hàng
+ */
+router.patch("/selectProductInCart", verifyToken, checkRoleCustomer, selectProductInCart);
+
 
 export default router;

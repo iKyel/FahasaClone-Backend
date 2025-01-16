@@ -174,7 +174,7 @@ export const updateCart = async (req: AuthenticatedRequest, res: Response) => {
             "tenSP giaBan"
           );
           return {
-            _id: detail.sanPhamId,
+            _id: detail._id,
             giaBan: sanPham?.giaBan || 0,
             tenSP: sanPham?.tenSP || "Không xác định",
             soLuong: detail.soLuong,
@@ -252,7 +252,7 @@ export const removeProduct = async (req: AuthenticatedRequest, res: Response) =>
                     "tenSP giaBan"
                   );
                   return {
-                    _id: detail.sanPhamId,
+                    _id: detail._id,
                     giaBan: sanPham?.giaBan || 0,
                     tenSP: sanPham?.tenSP || "Không xác định",
                     soLuong: detail.soLuong,

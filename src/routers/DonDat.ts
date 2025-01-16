@@ -39,6 +39,6 @@ router.put("/update", verifyToken, checkRoleCustomer, updateCart);
  * @route       DELETE '/api/order/remove/:id'
  * @description Xoá sản phẩm khỏi giỏ hàng
  */
-router.delete("/remove:id", verifyToken, checkRoleCustomer, removeProduct);
+router.delete("/remove/:id", verifyToken, checkRoleCustomer, removeProduct);
 
 export default router;

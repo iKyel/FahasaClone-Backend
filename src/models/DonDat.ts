@@ -15,10 +15,10 @@ const DonDatSchema: Schema = new Schema(
         trangThaiDon: {
             type: String,
             enum: [
-                "Chờ xác nhận", 
+                "Giỏ hàng",
+                "Chờ xác nhận",
                 "Hoàn thành",
                 "Đã hủy",
-                "Giỏ hàng"
             ],
             default: "Giỏ hàng",
         },

@@ -1,9 +1,10 @@
 import express from 'express';
 import verifyToken from '../middlewares/verifyToken';
 import { checkRoleCustomer } from '../middlewares/authorizedUser';
-import { 
+import {
     getCart,
     addToCart,
+    selectProductInCart,
     updateCart,
     removeProduct
 } from '../controllers/DonDat';
@@ -21,6 +22,12 @@ router.get("/getCart", verifyToken, checkRoleCustomer, getCart);
  * @description Thêm sản phẩm vào giỏ hàng
  */
 router.post("/addToCart", verifyToken, checkRoleCustomer, addToCart);
+
+/**
+ * @route       PATCH '/api/order/selectProductInCart'
+ * @description Chọn sản phẩm trong giỏ hàng
+ */
+router.patch("/selectProductInCart", verifyToken, checkRoleCustomer, selectProductInCart);
 
 /**
  * @route       PUT '/api/order/update'

@@ -20,6 +20,10 @@ const ChiTietDonDatSchema: Schema = new Schema({
         type: Number,
         required: true
     },
+    daChon: {
+        type: Boolean,
+        default: false
+    }
 });
 
 export default mongoose.model<IChiTietDonDat>("ChiTietDonDat", ChiTietDonDatSchema, "ChiTietDonDats");

@@ -95,6 +95,7 @@ export interface IChiTietDonDat extends Document {
   sanPhamId: mongoose.Types.ObjectId;
   soLuong: number;
   thanhTien: number;
+  daChon: boolean;
 }
 
 export interface INhaCungCap extends Document {

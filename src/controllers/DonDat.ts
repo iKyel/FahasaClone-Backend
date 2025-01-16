@@ -38,75 +38,133 @@ export const getCart = async (req: AuthenticatedRequest, res: Response) => {
 export const addToCart = async (req: AuthenticatedRequest, res: Response) => {
     try {
         const user = req.user!;
-        const { _id, numberOfProduct } = req.body as unknown as {
-            _id: string;
-            numberOfProduct: number;
-        };
-        const product = await SanPham.findById(_id).select(
-            "soLuong giaBan khuyenMai"
-        );
+        const { _id, numberOfProduct } = req.body as unknown as { _id: string, numberOfProduct: number };
+        const product = await SanPham.findById(_id)
+            .select('soLuong giaBan khuyenMai');
         if (!product) {
-            res.status(404).json({ message: "Không tìm thấy sản phẩm!" });
+            res.status(404).json({ message: 'Không tìm thấy sản phẩm!' });
             return;
         }
         // Lấy cart của người dùng
-        let cart = await getUserCart(user._id);
+        const cart = await getUserCart(user._id);
         let soLuongTrongCart = numberOfProduct;
         // Lấy cartDetail của người dùng
         const cartDetail = await ChiTietDonDat.findOne({
             donDatId: cart?._id,
-            sanPhamId: _id,
+            sanPhamId: _id
         });
         if (cartDetail) {
             soLuongTrongCart += cartDetail.soLuong;
         }
         // Kiểm tra số lượng trong giỏ + số lượng mới có vượt quá 10% số lượng tồn không
         if (soLuongTrongCart > product.soLuong * 0.1) {
-            res.status(400).json({
-                message: "Số lượng sản phẩm trong giỏ hàng vượt quá số lượng tồn!",
-            });
+            res.status(400).json({ message: 'Số lượng sản phẩm trong giỏ hàng vượt quá số lượng tồn!' });
             return;
         }
         // Không thì cập nhật số lượng và thành tiền. Nếu chưa có thì thêm mới
-        const thanhTien =
-            (product.giaBan - (product.giaBan * product.khuyenMai) / 100) *
-            soLuongTrongCart;
-        await ChiTietDonDat.findByIdAndUpdate(
-            cartDetail?._id,
+        const thanhTien = (product.giaBan - product.giaBan * product.khuyenMai / 100) * soLuongTrongCart;
+        await ChiTietDonDat.updateOne(
             {
-                $setOnInsert: {
-                    sanPhamId: _id,
-                    donDatId: cart?._id,
-                },
-                soLuong: soLuongTrongCart,
-                thanhTien: thanhTien,
+                sanPhamId: _id,
+                donDatId: cart?._id
             },
             {
-                upsert: true,
+                soLuong: soLuongTrongCart,
+                thanhTien: thanhTien
+            },
+            {
+                upsert: true
             }
         );
-        // Cập nhật tổng tiền của giỏ hàng
-        cart = (await DonDat.findByIdAndUpdate(
-            cart._id,
-            {
-                tongTien: cart?.tongTien + thanhTien,
-            },
-            {
-                new: true,
-            }
-        ))!;
         // Lấy cartDetail của người dùng sau khi cập nhật
         const newCartDetail = await getUserCartDetail(cart?._id);
         res.status(200).json({
-            message: "Thêm sản phẩm vào giỏ hàng thành công!",
+            message: 'Thêm sản phẩm vào giỏ hàng thành công!',
             cart,
-            cartDetail: newCartDetail,
+            cartDetail: newCartDetail
         });
     } catch (err) {
         console.log(err);
-        res.status(500).json({ message: "Lỗi hệ thống máy chủ." });
+        res.status(500).json({ message: 'Lỗi hệ thống máy chủ.' });
     }
 };
+
+/**
+ * @description Controller chọn sản phẩm trong giỏ hàng
+ * @param {AuthenticatedRequest} req - Request của người dùng
+ * @param {Response} res - Response trả về cho người dùng
+ * @returns message, cart, cartDetail
+ */
+export const selectProductInCart = async (req: AuthenticatedRequest, res: Response) => {
+    try {
+        const { id } = req.body as unknown as { id: string | boolean };
+        const user = req.user!;
+        let cart = await getUserCart(user._id);
+        let cartDetail = [];
+        // Nếu id là 'true' thì cập nhật 'daChon' và cập nhật tổng tiền trong giỏ hàng
+        if (id === true) {
+            await ChiTietDonDat.updateMany(
+                { donDatId: cart?._id },
+                { daChon: true },
+            );
+            cartDetail = await getUserCartDetail(cart?._id);
+            const tongTien = cartDetail.reduce((total, item) => total + item.thanhTien, 0);
+            cart = (await DonDat.findByIdAndUpdate(cart?._id,
+                {
+                    tongTien: tongTien
+                },
+                {
+                    new: true
+                }
+            ))!;
+        }
+        // Nếu id là 'false' thì tổng tiền = 0
+        else if (id === false) {
+            await ChiTietDonDat.updateMany(
+                { donDatId: cart?._id },
+                { daChon: false },
+            );
+            cartDetail = await getUserCartDetail(cart?._id);
+            cart = (await DonDat.findByIdAndUpdate(cart?._id,
+                {
+                    tongTien: 0
+                },
+                {
+                    new: true
+                }
+            ))!;
+        }
+        // Nếu id là id của cartDetail thì cập nhật 'daChon' và cập nhật tổng tiền trong giỏ hàng
+        else {
+            const cartDetailItem = await ChiTietDonDat.findByIdAndUpdate(id,
+                {
+                    daChon: { $not: '$daChon' }
+                },
+                {
+                    new: true
+                }
+            );
+            cartDetail = await getUserCartDetail(cart?._id);
+            const thanhTien = cartDetailItem?.daChon ? cartDetailItem?.thanhTien ?? 0 : -(cartDetailItem?.thanhTien ?? 0);
+            cart = (await DonDat.findByIdAndUpdate(cart?._id,
+                {
+                    tongTien: cart.tongTien + thanhTien
+                },
+                {
+                    new: true
+                }
+            ))!;
+        }
+        res.status(200).json({
+            message: 'Chọn sản phẩm trong giỏ hàng thành công!',
+            cart,
+            cartDetail
+        });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ message: 'Lỗi hệ thống máy chủ.' });
+    }
+}
 
 export const updateCart = async (req: AuthenticatedRequest, res: Response) => {
     try {
@@ -269,80 +327,3 @@ export const removeProduct = async (req: AuthenticatedRequest, res: Response) =>
         res.status(500).json({ message: "Có lỗi xảy ra, vui lòng thử lại." });
     }
 };
-
-/**
- * @description Controller chọn sản phẩm trong giỏ hàng
- * @param {AuthenticatedRequest} req - Request của người dùng
- * @param {Response} res - Response trả về cho người dùng
- * @returns message, cart, cartDetail
- */
-export const selectProductInCart = async (req: AuthenticatedRequest, res: Response) => {
-    try {
-        const { id } = req.body as unknown as { id: string | boolean };
-        const user = req.user!;
-        let cart = await getUserCart(user._id);
-        let cartDetail = [];
-        // Nếu id là 'true' thì cập nhật 'daChon' và cập nhật tổng tiền trong giỏ hàng
-        if (id === true) {
-            await ChiTietDonDat.updateMany(
-                { donDatId: cart?._id },
-                { daChon: true },
-            );
-            cartDetail = await getUserCartDetail(cart?._id);
-            const tongTien = cartDetail.reduce((total, item) => total + item.thanhTien, 0);
-            cart = (await DonDat.findByIdAndUpdate(cart?._id,
-                {
-                    tongTien: tongTien
-                },
-                {
-                    new: true
-                }
-            ))!;
-        }
-        // Nếu id là 'false' thì tổng tiền = 0
-        else if (id === false) {
-            await ChiTietDonDat.updateMany(
-                { donDatId: cart?._id },
-                { daChon: false },
-            );
-            cartDetail = await getUserCartDetail(cart?._id);
-            cart = (await DonDat.findByIdAndUpdate(cart?._id,
-                {
-                    tongTien: 0
-                },
-                {
-                    new: true
-                }
-            ))!;
-        }
-        // Nếu id là id của cartDetail thì cập nhật 'daChon' và cập nhật tổng tiền trong giỏ hàng
-        else {
-            const cartDetailItem = await ChiTietDonDat.findByIdAndUpdate(id,
-                {
-                    daChon: { $not: '$daChon' }
-                },
-                {
-                    new: true
-                }
-            );
-            cartDetail = await getUserCartDetail(cart?._id);
-            const thanhTien = cartDetailItem?.daChon ? cartDetailItem?.thanhTien ?? 0 : -(cartDetailItem?.thanhTien ?? 0);
-            cart = (await DonDat.findByIdAndUpdate(cart?._id,
-                {
-                    tongTien: cart.tongTien + thanhTien
-                },
-                {
-                    new: true
-                }
-            ))!;
-        }
-        res.status(200).json({
-            message: 'Chọn sản phẩm trong giỏ hàng thành công!',
-            cart,
-            cartDetail
-        });
-    } catch (err) {
-        console.log(err);
-        res.status(500).json({ message: 'Lỗi hệ thống máy chủ.' });
-    }
-}

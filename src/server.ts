@@ -5,7 +5,6 @@ import { Request, Response, NextFunction } from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
-import multer from "multer";
 
 // db
 import connectDB from "./connection/db";
@@ -16,6 +15,7 @@ import categoryRouter from "./routers/DanhMuc";
 import sanPhamRouter from "./routers/SanPham";
 import donDatRouter from "./routers/DonDat";
 import nhaCungCapRouter from "./routers/NhaCungCap";
+import dacTrungRouter from "./routers/DacTrung";
 
 
 dotenv.config(); // Load các biến môi trường từ file .env
@@ -41,6 +41,7 @@ app.use('/api/category', categoryRouter);
 app.use('/api/product', sanPhamRouter);
 app.use('/api/order', donDatRouter);
 app.use('/api/supplier', nhaCungCapRouter);
+app.use('/api/feature', dacTrungRouter);
 
 app.get('/', (req: Request, res: Response) => {
     res.status(200).json("Hello world");

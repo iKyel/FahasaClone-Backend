@@ -18,7 +18,7 @@ const DonDatSchema: Schema = new Schema(
                 "Giỏ hàng",
                 "Chờ xác nhận",
                 "Hoàn thành",
-                "Đã huỷ",
+                "Đã hủy",
             ],
             default: "Giỏ hàng",
         },

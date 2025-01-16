@@ -1,10 +1,12 @@
 import express from 'express';
 import verifyToken from '../middlewares/verifyToken';
 import { checkRoleCustomer } from '../middlewares/authorizedUser';
-import { 
+import {
     getCart,
     addToCart,
-    selectProductInCart
+    selectProductInCart,
+    updateCart,
+    removeProduct
 } from '../controllers/DonDat';
 
 const router = express.Router();
@@ -27,5 +29,16 @@ router.post("/addToCart", verifyToken, checkRoleCustomer, addToCart);
  */
 router.patch("/selectProductInCart", verifyToken, checkRoleCustomer, selectProductInCart);
 
+/**
+ * @route       PUT '/api/order/update'
+ * @description Xoá sản phẩm khỏi giỏ hàng
+ */
+router.put("/update", verifyToken, checkRoleCustomer, updateCart);
+
+/**
+ * @route       DELETE '/api/order/remove/:id'
+ * @description Xoá sản phẩm khỏi giỏ hàng
+ */
+router.delete("/remove:id", verifyToken, checkRoleCustomer, removeProduct);
 
 export default router;

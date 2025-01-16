@@ -232,6 +232,14 @@ export const updateCart = async (req: AuthenticatedRequest, res: Response) => {
       return res.status(404).json({ message: "Không tìm thấy giỏ hàng!" });
     }
 
+    // Cập nhật tổng tiền của giỏ hàng
+    const cartDetailList = await getUserCartDetail(cart._id);
+    const tongTien = cartDetailList.reduce((total, item) => {
+      // Cộng dồn thành tiền nếu sản phẩm đã được chọn (daChon = true)
+      return item.daChon ? total + item.thanhTien : total;
+    }, 0);
+
+    cart.tongTien = tongTien;
     await cart.save();
 
     // Lấy cartDetail của người dùng sau khi cập nhật
@@ -269,7 +277,7 @@ export const removeProduct = async (
       return res.status(404).json({ message: "Không tìm thấy giỏ hàng!" });
     }
 
-    console.log(id)
+    console.log(id);
     // Tìm chi tiết đơn đặt
     const cartDetail = await ChiTietDonDatModel.findById(id);
     if (!cartDetail) {
@@ -278,10 +286,26 @@ export const removeProduct = async (
         .json({ message: "Không tìm thấy sản phẩm trong giỏ hàng!" });
     }
 
-    const updatedCartDetail = await getUserCartDetail(cart._id);
+    // Nếu sản phẩm trong giỏ hàng có trường daChon là true, cần cập nhật lại tổng tiền
+    if (cartDetail.daChon) {
+      // Lấy danh sách chi tiết giỏ hàng của người dùng
+      const cartDetailList = await getUserCartDetail(cart._id);
+
+      // Tính lại tổng tiền (chỉ tính những sản phẩm daChon = true)
+      const tongTien = cartDetailList.reduce((total, item) => {
+        return item.daChon ? total + item.thanhTien : total;
+      }, 0);
+
+      // Cập nhật tổng tiền trong giỏ hàng
+      cart.tongTien = tongTien;
+      await cart.save(); // Lưu giỏ hàng với tổng tiền mới
+    }
 
     // Xoá
     await ChiTietDonDatModel.deleteOne({ _id: id });
+
+    // Cập nhật lại danh sách chi tiết giỏ hàng
+    const updatedCartDetail = await getUserCartDetail(cart._id);
 
     res.status(200).json({
       message: "Sản phẩm đã được xóa khỏi giỏ hàng!",

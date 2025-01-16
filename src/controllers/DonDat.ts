@@ -219,7 +219,7 @@ export const updateCart = async (req: AuthenticatedRequest, res: Response) => {
 
     // Cập nhật số lượng và thành tiền trong cartDetail
     cartDetail.soLuong = newQuantity;
-    cartDetail.thanhTien = newThanhTien;
+    cartDetail.thanhTien = Math.round(newThanhTien);
     await cartDetail.save();
 
     // Lấy giỏ hàng của người dùng

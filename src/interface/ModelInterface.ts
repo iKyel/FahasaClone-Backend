@@ -88,6 +88,7 @@ export interface IDonDat extends Document {
   ghiChu?: string;
   tongTien: number;
   createdAt: Date;
+  diaChiDatHang: string;
 }
 
 export interface IChiTietDonDat extends Document {

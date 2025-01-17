@@ -51,6 +51,10 @@ const DonDatSchema: Schema = new Schema(
             type: Number,
             default: 0
         },
+        diaChiDatHang: {
+            type: String,
+            required: true,
+        }
     },
     {
         timestamps: true,

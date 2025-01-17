@@ -61,8 +61,8 @@ export const addToCart = async (req: AuthenticatedRequest, res: Response) => {
         if (cartDetail) {
             soLuongTrongCart += cartDetail.soLuong;
         }
-        // Kiểm tra số lượng trong giỏ + số lượng mới có vượt quá 10% số lượng tồn không
-        if (soLuongTrongCart > product.soLuong * 0.1) {
+        // Kiểm tra số lượng trong giỏ + số lượng mới có vượt quá số lượng tồn không
+        if (soLuongTrongCart > product.soLuong) {
             res.status(400).json({
                 message: "Số lượng sản phẩm trong giỏ hàng vượt quá số lượng tồn!",
             });
@@ -203,8 +203,8 @@ export const updateCart = async (req: AuthenticatedRequest, res: Response) => {
             return res.status(404).json({ message: "Không tìm thấy sản phẩm." });
         }
 
-        // Kiểm tra số lượng mới có vượt quá 10% số lượng tồn không
-        if (newQuantity > product.soLuong * 0.1) {
+        // Kiểm tra số lượng mới có vượt quá số lượng tồn không
+        if (newQuantity > product.soLuong) {
             return res.status(400).json({
                 message: "Số lượng sản phẩm trong giỏ hàng vượt quá số lượng tồn!",
             });

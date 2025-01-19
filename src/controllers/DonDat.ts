@@ -382,9 +382,37 @@ export const createPaymentOrder = async (
   try {
     const { diaChi, ptVanChuyen, ptThanhToan, ghiChu } = req.body;
     const khachHangId = req.user?._id;
+
     if (!diaChi) {
       return res.status(400).json({ message: "Địa chỉ đặt hàng là bắt buộc" });
     }
+
+    // Lấy các sản phẩm đã chọn trong giỏ hàng
+    const currentCart = await DonDat.findOne({
+      khachHangId,
+      trangThaiDon: "Giỏ hàng",
+    });
+
+    if (!currentCart) {
+      return res.status(404).json({ message: "Giỏ hàng không tồn tại." });
+    }
+
+    const selectedItems = await ChiTietDonDat.find({
+      donDatId: currentCart._id,
+      daChon: true,
+    });
+
+    if (selectedItems.length === 0) {
+      return res
+        .status(400)
+        .json({ message: "Không có sản phẩm nào được chọn để thanh toán." });
+    }
+
+    // Tính tổng tiền
+    const tongTien = selectedItems.reduce(
+      (sum, item) => sum + item.thanhTien,
+      0
+    );
 
     // Tạo đơn đặt hàng mới
     const donDatMoi = new DonDat({
@@ -394,11 +422,41 @@ export const createPaymentOrder = async (
       ptThanhToan,
       ghiChu,
       trangThaiDon: "Chờ xác nhận",
+      tongTien,
     });
 
-    await donDatMoi.save();
+    const savedOrder = await donDatMoi.save();
 
-    return res.status(201).json({ message: "Tạo đơn đặt hàng thành công" });
+    // Cập nhật các sản phẩm vào đơn đặt hàng mới
+    await Promise.all(
+      selectedItems.map((item) =>
+        ChiTietDonDat.findByIdAndUpdate(item._id, {
+          donDatId: savedOrder._id,
+        })
+      )
+    );
+
+    // Xóa các sản phẩm đã chọn trong giỏ hàng cũ
+    await ChiTietDonDat.deleteMany({
+      donDatId: currentCart._id,
+      daChon: true,
+    });
+
+    // Populate thông tin sản phẩm
+    const populatedOrder = await DonDat.findById(savedOrder._id).populate({
+      path: "khachHangId",
+      select: "ten email",
+    });
+
+    const orderDetails = await ChiTietDonDat.find({
+      donDatId: savedOrder._id,
+    }).populate("sanPhamId", "tenSP giaBan khuyenMai imageUrl");
+
+    res.status(201).json({
+      message: "Tạo đơn đặt hàng thành công",
+      order: populatedOrder,
+      orderDetails,
+    });
   } catch (error) {
     console.error("Lỗi khi tạo đơn đặt hàng:", error);
     return res
@@ -406,6 +464,7 @@ export const createPaymentOrder = async (
       .json({ message: "Có lỗi xảy ra, vui lòng thử lại sau" });
   }
 };
+
 
 /**
  * @description Cập nhật trạng thái đơn đặt hàng từ "Chờ xác nhận" sang "Hoàn thành"
@@ -469,11 +528,9 @@ export const cancelOrder = async (req: AuthenticatedRequest, res: Response) => {
 
     // Kiểm tra trạng thái của đơn đặt hàng
     if (order.trangThaiDon !== "Chờ xác nhận") {
-      return res
-        .status(400)
-        .json({
-          message: "Chỉ có thể hủy đơn đặt hàng ở trạng thái 'Chờ xác nhận'.",
-        });
+      return res.status(400).json({
+        message: "Chỉ có thể hủy đơn đặt hàng ở trạng thái 'Chờ xác nhận'.",
+      });
     }
 
     // Cập nhật trạng thái đơn đặt hàng thành 'Đã hủy'
@@ -578,12 +635,12 @@ export const getSaleInvoiceDetail = async (
 
     // Tìm chi tiết đơn đặt hàng theo donDatId
     const detailSaleInvoices = await ChiTietDonDat.find({ donDatId: id })
-      .populate<{ sanPhamId: ISanPham }>("sanPhamId", "tenSP giaBan imageUrl") 
+      .populate<{ sanPhamId: ISanPham }>("sanPhamId", "tenSP giaBan imageUrl")
       .exec();
 
     // Trả về thông tin hóa đơn và chi tiết hóa đơn
     return res.json({
-      saleInvoice, 
+      saleInvoice,
       detailSaleInvoices: detailSaleInvoices.map((detail) => ({
         _id: detail._id,
         soLuong: detail.soLuong,
@@ -605,18 +662,18 @@ export const findSaleInvokes = async (
   res: Response
 ) => {
   try {
-    const { id } = req.params; 
+    const { id } = req.params;
 
     const saleInvoices = await DonDat.find({
       $or: [
-        { khachHangId: id },  // Tìm theo khachHangId
-        { _id: id }           // Tìm theo DonDatId (hoaDonBanId)
-      ]
+        { khachHangId: id }, // Tìm theo khachHangId
+        { _id: id }, // Tìm theo DonDatId (hoaDonBanId)
+      ],
     }).exec();
 
     // Nếu không có hóa đơn nào tìm thấy
     if (!saleInvoices || saleInvoices.length === 0) {
-      return res.status(404).json({ message: 'Không tìm thấy hóa đơn nào' });
+      return res.status(404).json({ message: "Không tìm thấy hóa đơn nào" });
     }
 
     // Tìm chi tiết đơn hàng từ ChiTietDonDat và populate thông tin sản phẩm
@@ -624,10 +681,10 @@ export const findSaleInvokes = async (
 
     for (const saleInvoice of saleInvoices) {
       const details = await ChiTietDonDat.find({ donDatId: id })
-      .populate<{ sanPhamId: ISanPham }>("sanPhamId", "tenSP giaBan imageUrl") // Populating thông tin sản phẩm từ bảng SanPham
-      .exec();
+        .populate<{ sanPhamId: ISanPham }>("sanPhamId", "tenSP giaBan imageUrl") // Populating thông tin sản phẩm từ bảng SanPham
+        .exec();
 
-      const detailSaleInvoices = details.map(detail => ({
+      const detailSaleInvoices = details.map((detail) => ({
         sanPhamId: detail.sanPhamId._id,
         tenSP: detail.sanPhamId.tenSP,
         soLuong: detail.soLuong,
@@ -642,10 +699,9 @@ export const findSaleInvokes = async (
       });
     }
 
-    return res.json({ saleInvoices: result, message: 'Tìm kiếm thành công' });
-
+    return res.json({ saleInvoices: result, message: "Tìm kiếm thành công" });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Có lỗi xảy ra, vui lòng thử lại' });
+    res.status(500).json({ message: "Có lỗi xảy ra, vui lòng thử lại" });
   }
 };

@@ -1,5 +1,5 @@
 import express from "express";
-import { addSupplier, getSuppliers } from "../controllers/NhaCungCap";
+import { addSupplier, getSuppliers, getSupplierById } from "../controllers/NhaCungCap";
 
 const router = express.Router();
 
@@ -9,4 +9,6 @@ router.post("/add", addSupplier);
 // Route xem nhà cung cấp
 router.get("/get", getSuppliers);
 
+// Route xem nhà cung cấp theo id
+router.get("/get/:id", getSupplierById);
 export default router;

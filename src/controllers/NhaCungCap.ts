@@ -43,3 +43,27 @@ export const getSuppliers = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Có lỗi xảy ra, vui lòng thử lại." });
   }
 };
+
+export const getSupplierById = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    // Tìm nhà cung cấp theo ID
+    const supplier = await NhaCungCap.findById(id);
+
+    if (!supplier) {
+      return res.status(404).json({ message: "Nhà cung cấp không tồn tại." });
+    }
+
+    return res.status(200).json({
+      supplier,
+      message: "Lấy thông tin nhà cung cấp thành công.",
+    });
+  } catch (error) {
+    console.error("Lỗi khi lấy thông tin nhà cung cấp:", error);
+    return res.status(500).json({ message: "Lỗi khi lấy thông tin nhà cung cấp." });
+  }
+};
+
+
+

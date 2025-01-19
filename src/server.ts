@@ -16,6 +16,7 @@ import sanPhamRouter from "./routers/SanPham";
 import donDatRouter from "./routers/DonDat";
 import nhaCungCapRouter from "./routers/NhaCungCap";
 import dacTrungRouter from "./routers/DacTrung";
+import hoaDonNhapRouter from "./routers/HoaDonNhap";
 
 
 dotenv.config(); // Load các biến môi trường từ file .env
@@ -42,6 +43,7 @@ app.use('/api/product', sanPhamRouter);
 app.use('/api/order', donDatRouter);
 app.use('/api/supplier', nhaCungCapRouter);
 app.use('/api/feature', dacTrungRouter);
+app.use('/api/purchaseInvoice', hoaDonNhapRouter);
 
 app.get('/', (req: Request, res: Response) => {
     res.status(200).json("Hello world");

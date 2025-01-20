@@ -567,7 +567,7 @@ export const customerGetSaleInvokes = async (
 
     // Lấy tất cả đơn đặt hàng của khách hàng sắp xếp theo createdAt
     const saleInvoices = await DonDat.find({
-      user: userId,
+      khachHangId: userId,
       trangThaiDon: { $ne: "Giỏ hàng" },
     }).sort({ createdAt: -1 }); // Sắp xếp giảm dần theo createdAt
 

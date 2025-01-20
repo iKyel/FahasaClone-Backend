@@ -465,7 +465,6 @@ export const createPaymentOrder = async (
   }
 };
 
-
 /**
  * @description Cập nhật trạng thái đơn đặt hàng từ "Chờ xác nhận" sang "Hoàn thành"
  * @param {Request} req - Request chứa id của đơn đặt hàng trong params
@@ -571,23 +570,29 @@ export const customerGetSaleInvokes = async (
       trangThaiDon: { $ne: "Giỏ hàng" },
     }).sort({ createdAt: -1 });
 
-    const totalOrders = saleInvoices.length;
-
     // Tìm tất cả chi tiết đơn đặt hàng liên quan đến các đơn đặt
     const saleInvoiceIds = saleInvoices.map((invoice) => invoice._id);
     const details = await ChiTietDonDat.find({
       donDatId: { $in: saleInvoiceIds },
     });
 
-    // Tính tổng số lượng sản phẩm từ tất cả chi tiết đơn đặt
-    const totalQuantity = details.reduce(
-      (acc, detail) => acc + detail.soLuong,
-      0
-    );
+    // Tính số lượng sản phẩm cho từng đơn đặt hàng
+    const orderQuantities = saleInvoices.map((invoice) => {
+      const orderDetails = details.filter(
+        (detail) => detail.donDatId.toString() === invoice._id.toString()
+      );
+      const totalQuantity = orderDetails.reduce(
+        (acc, detail) => acc + detail.soLuong,
+        0
+      );
+      return {
+        ...invoice.toObject(),
+        soLuong: totalQuantity,
+      };
+    });
 
     res.status(200).json({
-      saleInvoices,
-      soLuong: totalQuantity,
+      saleInvoices: orderQuantities,
       message: "Lấy danh sách đơn đặt hàng thành công!",
     });
   } catch (err) {
@@ -595,7 +600,6 @@ export const customerGetSaleInvokes = async (
     res.status(500).json({ message: "Lỗi hệ thống máy chủ." });
   }
 };
-
 
 /**
  * @description Xem danh sách tất cả đơn đặt (không phải giỏ hàng) cho nhân viên

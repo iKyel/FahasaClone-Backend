@@ -556,7 +556,7 @@ export const cancelOrder = async (req: AuthenticatedRequest, res: Response) => {
  * @description Xem danh sách đơn đặt hàng của khách hàng (không phải giỏ hàng)
  * @param {AuthenticatedRequest} req - Request của người dùng
  * @param {Response} res - Response trả về cho người dùng
- * @returns saleInvoices, message
+ * @returns saleInvoices, totalOrders, totalQuantity, message
  */
 export const customerGetSaleInvokes = async (
   req: AuthenticatedRequest,
@@ -569,13 +569,25 @@ export const customerGetSaleInvokes = async (
     const saleInvoices = await DonDat.find({
       khachHangId: userId,
       trangThaiDon: { $ne: "Giỏ hàng" },
-    }).sort({ createdAt: -1 }); // Sắp xếp giảm dần theo createdAt
+    }).sort({ createdAt: -1 });
 
     const totalOrders = saleInvoices.length;
 
+    // Tìm tất cả chi tiết đơn đặt hàng liên quan đến các đơn đặt
+    const saleInvoiceIds = saleInvoices.map((invoice) => invoice._id);
+    const details = await ChiTietDonDat.find({
+      donDatId: { $in: saleInvoiceIds },
+    });
+
+    // Tính tổng số lượng sản phẩm từ tất cả chi tiết đơn đặt
+    const totalQuantity = details.reduce(
+      (acc, detail) => acc + detail.soLuong,
+      0
+    );
+
     res.status(200).json({
       saleInvoices,
-      soLuong: totalOrders,
+      soLuong: totalQuantity,
       message: "Lấy danh sách đơn đặt hàng thành công!",
     });
   } catch (err) {
@@ -583,6 +595,7 @@ export const customerGetSaleInvokes = async (
     res.status(500).json({ message: "Lỗi hệ thống máy chủ." });
   }
 };
+
 
 /**
  * @description Xem danh sách tất cả đơn đặt (không phải giỏ hàng) cho nhân viên

@@ -55,7 +55,7 @@ router.post("/createPaymentOrder", verifyToken, checkRoleCustomer, createPayment
 
 router.patch("/completeOrder/:id", verifyToken, checkRoleStaff, completeOrder);
 
-router.patch("/cancelOrder/:id", verifyToken, checkRoleStaff, cancelOrder);
+router.patch("/cancelOrder/:id", verifyToken, cancelOrder);
 
 router.get("/customerGetSaleInvokes", verifyToken, checkRoleCustomer, customerGetSaleInvokes);
 

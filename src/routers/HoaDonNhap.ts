@@ -4,7 +4,7 @@ import {
     confirmPurchaseInvoice,
     createPurchaseInvoice,
     getAllPurchaseInvoices,
-    getDetailPuchaseInvoice,
+    getDetailPurchaseInvoice,
     searchInvoice
 } from '../controllers/HoaDonNhap';
 import verifyToken from '../middlewares/verifyToken';
@@ -43,7 +43,7 @@ router.get("/getAll", verifyToken, checkRoleStaff, getAllPurchaseInvoices);
  * @description Lấy chi tiết hóa đơn nhập
  * @param       id - id của hóa đơn nhập
  */
-router.get("/getDetail/:id", verifyToken, checkRoleStaff, getDetailPuchaseInvoice);
+router.get("/getDetail/:id", verifyToken, checkRoleStaff, getDetailPurchaseInvoice);
 
 /**
  * @route       GET '/api/purchaseInvoice/searchInvoice'

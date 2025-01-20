@@ -14,13 +14,13 @@ import mongoose from 'mongoose';
 export const createPurchaseInvoice = async (req: AuthenticatedRequest, res: Response) => {
     try {
         const user = req.user;
-        const { purchaseInvoice, detailPuchaseInvoices } = req.body as unknown as {
+        const { purchaseInvoice, detailPurchaseInvoices } = req.body as unknown as {
             purchaseInvoice: {
                 supplierId: string,
                 ghiChu: string,
                 tongTien: number
             }
-            detailPuchaseInvoices: Array<{
+            detailPurchaseInvoices: Array<{
                 productId: string,
                 soLuong: number,
                 thanhTien: number,
@@ -35,7 +35,7 @@ export const createPurchaseInvoice = async (req: AuthenticatedRequest, res: Resp
         });
         // Tạo các chi tiết hóa đơn nhập
         await ChiTietHDN.create(
-            detailPuchaseInvoices.map(detail => ({
+            detailPurchaseInvoices.map(detail => ({
                 hoaDonNhapId: newPurchaseInvoice._id,
                 sanPhamId: detail.productId,
                 soLuong: detail.soLuong,
@@ -154,7 +154,7 @@ export const getAllPurchaseInvoices = async (req: AuthenticatedRequest, res: Res
  * @param {Response} res - Response trả về cho người dùng
  * @returns purchaseInvoice, detailPurchaseInvoices, message
  */
-export const getDetailPuchaseInvoice = async (req: AuthenticatedRequest, res: Response) => {
+export const getDetailPurchaseInvoice = async (req: AuthenticatedRequest, res: Response) => {
     try {
         const { id } = req.params;
         // Lấy hóa đơn nhập

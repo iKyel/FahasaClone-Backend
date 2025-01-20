@@ -52,8 +52,7 @@ const DonDatSchema: Schema = new Schema(
             default: 0
         },
         diaChiDatHang: {
-            type: String,
-            required: true,
+            type: String
         }
     },
     {

@@ -75,10 +75,11 @@ export interface IDonDat extends Document {
     | "Đã hủy";
   ptVanChuyen:
     | "Giao hàng tiết kiệm"
-    | "Giao hàng nhanh"
+    | "Giao hàng hoả tốc"
     | "Giao hàng tiêu chuẩn";
   ptThanhToan:
-    | "Tiền mặt khi nhận hàng"
+    | "COD"
+    | "PayPal"
     | "ATM / Internet Banking"
     | "Ví Momo"
     | "Ví Zalopay"

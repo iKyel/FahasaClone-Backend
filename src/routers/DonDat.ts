@@ -13,7 +13,8 @@ import {
     cancelOrder,
     customerGetSaleInvokes,
     staffGetSaleInvokes,
-    getSaleInvoiceDetail
+    getSaleInvoiceDetail,
+    findSaleInvokes
 } from '../controllers/DonDat';
 
 const router = express.Router();
@@ -63,4 +64,7 @@ router.get("/staffGetSaleInvokes", verifyToken, checkRoleStaff, staffGetSaleInvo
 router.get("/getSaleInvoikeDetail/:id", verifyToken, getSaleInvoiceDetail);
 
 router.get("/getSaleInvokesById/:id", verifyToken, checkRoleStaff, getSaleInvoiceDetail);
+
+router.get("/sale-invoices/:id", verifyToken, findSaleInvokes);
+
 export default router;

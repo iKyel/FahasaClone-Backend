@@ -26,7 +26,7 @@ const DonDatSchema: Schema = new Schema(
             type: String,
             enum: [
                 "Giao hàng tiết kiệm",
-                "Giao hàng nhanh",
+                "Giao hàng hoả tốc",
                 "Giao hàng tiêu chuẩn"
             ],
             default: "Giao hàng tiêu chuẩn",
@@ -34,7 +34,8 @@ const DonDatSchema: Schema = new Schema(
         ptThanhToan: {
             type: String,
             enum: [
-                "Tiền mặt khi nhận hàng",
+                "COD",
+                "PayPal",
                 "ATM / Internet Banking",
                 "Ví Momo",
                 "Ví Zalopay",

@@ -65,6 +65,6 @@ router.get("/getSaleInvoikeDetail/:id", verifyToken, getSaleInvoiceDetail);
 
 router.get("/getSaleInvokesById/:id", verifyToken, checkRoleStaff, getSaleInvoiceDetail);
 
-router.get("/sale-invoices/:id", verifyToken, findSaleInvokes);
+router.get("/findSaleInvoices/:id", verifyToken, findSaleInvokes);
 
 export default router;

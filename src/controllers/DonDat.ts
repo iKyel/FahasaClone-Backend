@@ -568,7 +568,6 @@ export const cancelOrder = async (req: AuthenticatedRequest, res: Response) => {
 
     res.status(200).json({
       saleInvoices: orderQuantities,
-      soLuong: orderQuantities.length,
       message: "Hủy đơn đặt hàng thành công!",
     });
   } catch (err) {

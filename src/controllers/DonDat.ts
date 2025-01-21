@@ -524,9 +524,19 @@ export const cancelOrder = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { id } = req.params;
 
+    // Kiểm tra xem user đã xác thực hay chưa
+    if (!req.user) {
+      return res.status(401).json({ message: "Bạn cần đăng nhập để thực hiện chức năng này." });
+    }
+
     const order = await DonDat.findById(id);
     if (!order) {
       return res.status(404).json({ message: "Không tìm thấy đơn đặt hàng!" });
+    }
+
+    // Kiểm tra quyền sở hữu đơn đặt hàng
+    if (order.khachHang.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: "Bạn không có quyền hủy đơn đặt hàng này." });
     }
 
     // Kiểm tra trạng thái của đơn đặt hàng
@@ -541,7 +551,7 @@ export const cancelOrder = async (req: AuthenticatedRequest, res: Response) => {
     await order.save();
 
     // Lấy danh sách tất cả các đơn đặt hàng để trả về
-    const saleInvoices = await DonDat.find();
+    const saleInvoices = await DonDat.find({ khachHang: req.user._id });
     const totalOrders = saleInvoices.length;
 
     res.status(200).json({

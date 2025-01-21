@@ -544,7 +544,10 @@ export const cancelOrder = async (req: AuthenticatedRequest, res: Response) => {
     await order.save();
 
     // Lấy danh sách tất cả các đơn đặt hàng để trả về
-    const saleInvoices = await DonDat.find({ khachHangId: req.user._id });
+    const saleInvoices = await DonDat.find({
+      khachHangId: req.user._id,
+      trangThaiDon: { $ne: "Giỏ hàng" },
+    });
 
     // Tính số lượng sản phẩm cho từng đơn đặt hàng
     const saleInvoiceIds = saleInvoices.map((invoice) => invoice._id);

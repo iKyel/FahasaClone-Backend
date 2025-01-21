@@ -26,7 +26,7 @@ const DonDatSchema: Schema = new Schema(
             type: String,
             enum: [
                 "Giao hàng tiết kiệm",
-                "Giao hàng hoả tốc",
+                "Giao hàng hỏa tốc",
                 "Giao hàng tiêu chuẩn"
             ],
             default: "Giao hàng tiêu chuẩn",

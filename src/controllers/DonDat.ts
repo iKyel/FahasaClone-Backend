@@ -275,7 +275,6 @@ export const removeProduct = async (
       return res.status(404).json({ message: "Không tìm thấy giỏ hàng!" });
     }
 
-    console.log(id);
     // Tìm chi tiết đơn đặt
     const cartDetail = await ChiTietDonDatModel.findById(id);
     if (!cartDetail) {
@@ -382,7 +381,6 @@ export const createPaymentOrder = async (
   try {
     const { diaChi, ptVanChuyen, ptThanhToan, ghiChu } = req.body;
     const khachHangId = req.user?._id;
-
     if (!diaChi) {
       return res.status(400).json({ message: "Địa chỉ đặt hàng là bắt buộc" });
     }
@@ -526,17 +524,12 @@ export const cancelOrder = async (req: AuthenticatedRequest, res: Response) => {
 
     // Kiểm tra xem user đã xác thực hay chưa
     if (!req.user) {
-      return res.status(401).json({ message: "Bạn cần đăng nhập để thực hiện chức năng này." });
+      return res.status(401).json({ message: "Unauthorized" });
     }
 
     const order = await DonDat.findById(id);
     if (!order) {
-      return res.status(404).json({ message: "Không tìm thấy đơn đặt hàng!" });
-    }
-
-    // Kiểm tra quyền sở hữu đơn đặt hàng
-    if (order.khachHang.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ message: "Bạn không có quyền hủy đơn đặt hàng này." });
+      return res.status(404).json({ message: "Order not found" });
     }
 
     // Kiểm tra trạng thái của đơn đặt hàng
@@ -551,12 +544,31 @@ export const cancelOrder = async (req: AuthenticatedRequest, res: Response) => {
     await order.save();
 
     // Lấy danh sách tất cả các đơn đặt hàng để trả về
-    const saleInvoices = await DonDat.find({ khachHang: req.user._id });
-    const totalOrders = saleInvoices.length;
+    const saleInvoices = await DonDat.find({ khachHangId: req.user._id });
+
+    // Tính số lượng sản phẩm cho từng đơn đặt hàng
+    const saleInvoiceIds = saleInvoices.map((invoice) => invoice._id);
+    const details = await ChiTietDonDat.find({
+      donDatId: { $in: saleInvoiceIds },
+    });
+
+    const orderQuantities = saleInvoices.map((invoice) => {
+      const orderDetails = details.filter(
+        (detail) => detail.donDatId.toString() === invoice._id.toString()
+      );
+      const totalQuantity = orderDetails.reduce(
+        (acc, detail) => acc + detail.soLuong,
+        0
+      );
+      return {
+        ...invoice.toObject(),
+        soLuong: totalQuantity,
+      };
+    });
 
     res.status(200).json({
-      saleInvoices,
-      soLuong: totalOrders,
+      saleInvoices: orderQuantities,
+      soLuong: orderQuantities.length,
       message: "Hủy đơn đặt hàng thành công!",
     });
   } catch (err) {

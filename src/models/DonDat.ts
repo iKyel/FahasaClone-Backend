@@ -43,7 +43,7 @@ const DonDatSchema: Schema = new Schema(
                 "Ví ShopeePay",
                 "Visa / Master / JCB",
             ],
-            default: "Tiền mặt khi nhận hàng",
+            default: "COD",
         },
         ghiChu: {
             type: String,

@@ -35,6 +35,7 @@ router.patch("/cancel/:id", verifyToken, checkRoleStaff, cancelPurchaseInvoice);
 /**
  * @route       GET '/api/purchaseInvoice/getAll'
  * @description Lấy tất cả hóa đơn nhập
+ * @query       pageNum - trang hiện tại
  */
 router.get("/getAll", verifyToken, checkRoleStaff, getAllPurchaseInvoices);
 
@@ -49,6 +50,7 @@ router.get("/getDetail/:id", verifyToken, checkRoleStaff, getDetailPurchaseInvoi
  * @route       GET '/api/purchaseInvoice/searchInvoice'
  * @description Tìm kiếm hóa đơn nhập
  * @query       id - id của nhà cung cấp hoặc hóa đơn nhập
+ *              pageNum - trang hiện tại
  */
 router.get("/searchInvoice", verifyToken, checkRoleStaff, searchInvoice);
 

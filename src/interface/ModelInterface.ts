@@ -75,7 +75,7 @@ export interface IDonDat extends Document {
     | "Đã hủy";
   ptVanChuyen:
     | "Giao hàng tiết kiệm"
-    | "Giao hàng hoả tốc"
+    | "Giao hàng hỏa tốc"
     | "Giao hàng tiêu chuẩn";
   ptThanhToan:
     | "COD"

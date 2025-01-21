@@ -5,6 +5,8 @@ import ChiTietHDN from '../models/ChiTietHDN';
 import SanPham from '../models/SanPham';
 import mongoose from 'mongoose';
 
+const ITEMS_PER_PAGE = 24;
+
 /**
  * @description Controller tạo hóa đơn nhập
  * @param {AuthenticatedRequest} req - Request của người dùng
@@ -137,10 +139,20 @@ export const cancelPurchaseInvoice = async (req: AuthenticatedRequest, res: Resp
  */
 export const getAllPurchaseInvoices = async (req: AuthenticatedRequest, res: Response) => {
     try {
-        const purchaseInvoices = await HoaDonNhap.find();
-        res.status(200).json({ 
+        const { pageNum = 1 } = req.query as unknown as { pageNum: number };
+        // Lấy tổng số trang hóa đơn nhập
+        const totalInvoices = await HoaDonNhap.countDocuments();
+        const totalPage = Math.ceil(totalInvoices / ITEMS_PER_PAGE);
+
+        // Lấy danh sách hóa đơn nhập theo trang hiện tại
+        const purchaseInvoices = await HoaDonNhap.find()
+            .skip((pageNum - 1) * ITEMS_PER_PAGE)
+            .limit(ITEMS_PER_PAGE);
+
+        res.status(200).json({
             message: "Lấy danh sách hóa đơn nhập thành công.",
-            purchaseInvoices 
+            purchaseInvoices,
+            totalPage
         });
     } catch (err) {
         console.log(err);
@@ -219,21 +231,29 @@ export const getDetailPurchaseInvoice = async (req: AuthenticatedRequest, res: R
  */
 export const searchInvoice = async (req: AuthenticatedRequest, res: Response) => {
     try {
-        const { id } = req.query as unknown as { id: string };
-        let purchaseInvoices;
+        const { id, pageNum = 1 } = req.query as unknown as { id: string, pageNum: number };
+        let filter = {};
         if (id) {
-            purchaseInvoices = await HoaDonNhap.find({
+            filter = {
                 $or: [
                     { _id: id },
                     { nhaCungCapId: id }
                 ]
-            });
-        } else {
-            purchaseInvoices = await HoaDonNhap.find();
+            }
         }
+        // Lấy tổng số trang hóa đơn nhập
+        const totalInvoices = await HoaDonNhap.countDocuments(filter);
+        const totalPage = Math.ceil(totalInvoices / ITEMS_PER_PAGE);
+
+        // Lấy danh sách hóa đơn nhập theo trang hiện tại
+        const purchaseInvoices = await HoaDonNhap.find(filter)
+            .skip((pageNum - 1) * ITEMS_PER_PAGE)
+            .limit(ITEMS_PER_PAGE);
+
         res.status(200).json({
             message: "Tìm kiếm hóa đơn nhập thành công.",
-            purchaseInvoices
+            purchaseInvoices,
+            totalPage
         });
     } catch (err) {
         console.log(err);

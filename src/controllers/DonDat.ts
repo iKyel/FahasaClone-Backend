@@ -442,6 +442,10 @@ export const createPaymentOrder = async (
       daChon: true,
     });
 
+    // Cập nhật tổng tiền giỏ hàng về 0
+    currentCart.tongTien = 0;
+    await currentCart.save();
+
     // Populate thông tin sản phẩm
     const populatedOrder = await DonDat.findById(savedOrder._id).populate({
       path: "khachHangId",

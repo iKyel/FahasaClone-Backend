@@ -4,7 +4,7 @@ import {
   getCategories,
   getCategoryName,
   deleteCategory,
-  editCategoryName
+  editCategoryName,
 } from "../controllers/DanhMuc";
 import { checkRoleStaff } from "../middlewares/authorizedUser";
 import verifyToken from "../middlewares/verifyToken";
@@ -36,6 +36,11 @@ router.delete(
   deleteCategory
 );
 
-router.put("/editCategoryName/:id", editCategoryName);
+router.put(
+  "/editCategoryName/:id",
+  verifyToken,
+  checkRoleStaff,
+  editCategoryName
+);
 
 export default router;

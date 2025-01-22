@@ -494,7 +494,7 @@ export const completeOrder = async (
     }
 
     // Kiểm tra trạng thái đơn đặt hàng hiện tại
-    if (order.trangThaiDon !== "Chờ xác nhận") {
+    if (order.trangThaiDon !== "Đã xác nhận") {
       return res
         .status(400)
         .json({ message: "Trạng thái đơn đặt hàng không hợp lệ để cập nhật." });
@@ -502,6 +502,45 @@ export const completeOrder = async (
 
     // Cập nhật trạng thái thành "Hoàn thành"
     order.trangThaiDon = "Hoàn thành";
+    await order.save();
+
+    // Lấy danh sách tất cả đơn đặt hàng và tổng số lượng
+    const allOrders = await DonDat.find();
+    const totalOrders = allOrders.length;
+
+    // Trả về response
+    return res.status(200).json({
+      message: "Cập nhật trạng thái đơn đặt hàng thành công.",
+      saleInvoices: { orders: allOrders, totalOrders },
+    });
+  } catch (error) {
+    console.error("Lỗi khi cập nhật trạng thái đơn đặt hàng:", error);
+    return res.status(500).json({ message: "Lỗi hệ thống máy chủ." });
+  }
+};
+
+export const confirmOrder = async (
+  req: AuthenticatedRequest,
+  res: Response
+) => {
+  try {
+    const { id } = req.params;
+
+    // Tìm đơn đặt hàng theo ID
+    const order = await DonDat.findById(id);
+    if (!order) {
+      return res.status(404).json({ message: "Không tìm thấy đơn đặt hàng." });
+    }
+
+    // Kiểm tra trạng thái đơn đặt hàng hiện tại
+    if (order.trangThaiDon !== "Chờ xác nhận") {
+      return res
+        .status(400)
+        .json({ message: "Trạng thái đơn đặt hàng không hợp lệ để cập nhật." });
+    }
+
+    // Cập nhật trạng thái thành "Đã xác nhận"
+    order.trangThaiDon = "Đã xác nhận";
     await order.save();
 
     // Lấy danh sách tất cả đơn đặt hàng và tổng số lượng

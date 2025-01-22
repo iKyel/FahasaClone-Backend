@@ -15,7 +15,8 @@ import {
     staffGetSaleInvokes,
     getSaleInvoiceDetail,
     findSaleInvokes,
-    editOrder
+    editOrder,
+    confirmOrder
 } from '../controllers/DonDat';
 
 const router = express.Router();
@@ -55,6 +56,8 @@ router.get("/getSelectedProduct", verifyToken, checkRoleCustomer, getSelectedPro
 router.post("/createPaymentOrder", verifyToken, checkRoleCustomer, createPaymentOrder);
 
 router.patch("/completeOrder/:id", verifyToken, checkRoleStaff, completeOrder);
+
+router.patch("/confirmOrder/:id", verifyToken, checkRoleStaff, confirmOrder);
 
 router.patch("/cancelOrder/:id", verifyToken, cancelOrder);
 

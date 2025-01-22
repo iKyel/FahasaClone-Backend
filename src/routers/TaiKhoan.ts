@@ -13,6 +13,7 @@ import {
     getEmployees,
     search,
     lock,
+    getAccountById,
 } from "../controllers/TaiKhoan";
 import verifyToken from "../middlewares/verifyToken";
 import { checkRoleAdmin, checkRoleStaff } from "../middlewares/authorizedUser";
@@ -42,6 +43,13 @@ router.get("/logout", verifyToken, logout);
  * @description Lấy thông tin tài khoản
  */
 router.get('/getAccount', verifyToken, getAccount);
+
+/**
+ * @route       GET '/api/account/getAccount/:id'
+ * @description Lấy thông tin tài khoản theo id
+ * @param       id - id của tài khoản
+ */
+router.get('/getAccountById/:id', verifyToken, getAccountById);
 
 /**
  * @route       PUT '/api/account/updateAccount'

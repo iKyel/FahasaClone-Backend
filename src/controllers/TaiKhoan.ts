@@ -128,6 +128,27 @@ export const getAccount = async (req: AuthenticatedRequest, res: Response) => {
 }
 
 /**
+ * @description Lấy thông tin tài khoản theo id
+ * @param {Request} req - Request object
+ * @param {Response} res - Response object
+ * @returns message, user
+ */
+export const getAccountById = async (req: AuthenticatedRequest, res: Response) => {
+    const userId = req.params.id;
+    try {
+        const user = await TaiKhoan.findById(userId)
+            .select("-password");
+        res.status(200).json({
+            message: 'Lấy thông tin thành công!',
+            user
+        });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ message: 'Lỗi hệ thống máy chủ.' });
+    }
+}
+
+/**
  * @description Cập nhật thông tin cá nhân
  * @param {Request} req - Request object
  * @param {Response} res - Response object

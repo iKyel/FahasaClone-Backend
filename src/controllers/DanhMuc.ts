@@ -66,7 +66,6 @@ export const getCategoryName = async (req: Request, res: Response) => {
 export const deleteCategory = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    console.log(id)
 
     // get all subcategories recursively
     const getSubcategories = async (parentId: mongoose.Types.ObjectId) => {

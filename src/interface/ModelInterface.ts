@@ -79,13 +79,6 @@ export interface IDonDat extends Document {
     | "Giao hàng tiêu chuẩn";
   ptThanhToan:
     | "COD"
-    | "PayPal"
-    | "ATM / Internet Banking"
-    | "Ví Momo"
-    | "Ví Zalopay"
-    | "VNPay"
-    | "Ví ShopeePay"
-    | "Visa / Master / JCB";
   ghiChu?: string;
   tongTien: number;
   createdAt: Date;
@@ -95,6 +88,8 @@ export interface IDonDat extends Document {
 export interface IChiTietDonDat extends Document {
   donDatId: mongoose.Types.ObjectId;
   sanPhamId: mongoose.Types.ObjectId;
+  giaBan: number;
+  khuyenMai: number;
   soLuong: number;
   thanhTien: number;
   daChon: boolean;
@@ -107,10 +102,7 @@ export interface INhaCungCap extends Document {
 export interface IHoaDonNhap extends Document {
   nhaCungCapId: mongoose.Types.ObjectId;
   nhanVienId: mongoose.Types.ObjectId;
-  trangThaiDon: 
-    | "Chờ xác nhận" 
-    | "Hoàn thành" 
-    | "Đã hủy";
+  trangThaiDon: "Chờ xác nhận" | "Hoàn thành" | "Đã hủy";
   ghiChu: string;
   tongTien: number;
   createdAt: Date;

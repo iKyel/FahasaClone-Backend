@@ -35,14 +35,7 @@ const DonDatSchema: Schema = new Schema(
         ptThanhToan: {
             type: String,
             enum: [
-                "COD",
-                "PayPal",
-                "ATM / Internet Banking",
-                "Ví Momo",
-                "Ví Zalopay",
-                "VNPay",
-                "Ví ShopeePay",
-                "Visa / Master / JCB",
+                "COD"
             ],
             default: "COD",
         },

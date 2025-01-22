@@ -400,6 +400,12 @@ export const createPaymentOrder = async (
       daChon: true,
     });
 
+    for (const item of selectedItems) {
+      const product = item.sanPhamId as unknown as ISanPham;
+      item.giaBan = product.giaBan;
+      await item.save();
+    }
+
     if (selectedItems.length === 0) {
       return res
         .status(400)
@@ -696,7 +702,7 @@ export const getSaleInvoiceDetail = async (
 
     // Tìm chi tiết đơn đặt hàng theo donDatId
     const detailSaleInvoices = await ChiTietDonDat.find({ donDatId: id })
-      .populate<{ sanPhamId: ISanPham }>("sanPhamId", "tenSP giaBan imageUrl")
+      .populate<{ sanPhamId: ISanPham }>("sanPhamId", "tenSP imageUrl")
       .exec();
 
     // Trả về thông tin hóa đơn và chi tiết hóa đơn
@@ -708,7 +714,7 @@ export const getSaleInvoiceDetail = async (
         thanhTien: detail.thanhTien,
         sanPhamId: detail.sanPhamId._id,
         tenSP: detail.sanPhamId.tenSP,
-        giaBan: detail.sanPhamId.giaBan,
+        giaBan: detail.giaBan,
         imageUrl: detail.sanPhamId.imageUrl,
       })),
     });

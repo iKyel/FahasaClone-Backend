@@ -12,6 +12,14 @@ const ChiTietDonDatSchema: Schema = new Schema({
         ref: "SanPham",
         required: true
     },
+    giaBan: {
+        type: Number,
+        required: true
+    },
+    khuyenMai : {
+        type: Number,
+        default: 0
+    },
     soLuong: {
         type: Number,
         required: true

@@ -33,20 +33,6 @@ export interface ISanPham extends Document {
   createdAt: Date;
 }
 
-export interface IYeuThich extends Document {
-  taiKhoanId: mongoose.Types.ObjectId;
-  sanPhamId: mongoose.Types.ObjectId;
-}
-
-export interface IDanhGia extends Document {
-  taiKhoanId: mongoose.Types.ObjectId;
-  sanPhamId: mongoose.Types.ObjectId;
-  xepHang: number;
-  binhLuan: string;
-  trangThaiDuyet: "cho_duyet" | "da_duyet" | "tu_choi";
-  createdAt: Date;
-}
-
 export interface IDanhMuc extends Document {
   ten: string;
   parentId: mongoose.Types.ObjectId | null;

@@ -24,6 +24,7 @@ export const createPurchaseInvoice = async (req: AuthenticatedRequest, res: Resp
             }
             detailPurchaseInvoices: Array<{
                 productId: string,
+                giaNhap: number,
                 soLuong: number,
                 thanhTien: number,
             }>
@@ -40,11 +41,103 @@ export const createPurchaseInvoice = async (req: AuthenticatedRequest, res: Resp
             detailPurchaseInvoices.map(detail => ({
                 hoaDonNhapId: newPurchaseInvoice._id,
                 sanPhamId: detail.productId,
+                giaNhap: detail.giaNhap,
                 soLuong: detail.soLuong,
                 thanhTien: detail.thanhTien
             }))
         );
         res.status(201).json({ message: "Tạo hóa đơn nhập thành công." });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ message: "Lỗi hệ thống máy chủ." });
+    }
+}
+
+/**
+ * @description Controller sửa hóa đơn nhập 'Chờ xác nhận' (chi tiết hóa đơn nhập, ghi chú) 
+ * @param {AuthenticatedRequest} req - Request của người dùng
+ * @param {Response} res - Response trả về cho người dùng
+ * @returns message
+ */
+export const updatePurchaseInvoice = async (req: AuthenticatedRequest, res: Response) => {
+    try {
+        const { id } = req.params;      // id của hóa đơn nhập
+        const { ghiChu = "", tongTien, detailPurchaseInvoices } = req.body as unknown as {
+            ghiChu: string,
+            tongTien: number,
+            detailPurchaseInvoices: Array<{
+                _id: string,
+                giaNhap: number,
+                soLuong: number,
+                thanhTien: number
+            }>
+        };
+
+        // Kiểm tra hóa đơn nhập có tồn tại không
+        let purchaseInvoice = await HoaDonNhap.findById(id);
+        if (!purchaseInvoice) {
+            res.status(404).json({ message: "Không tìm thấy hóa đơn nhập." });
+            return;
+        }
+        if (purchaseInvoice.trangThaiDon !== "Chờ xác nhận") {
+            res.status(400).json({ message: "Hóa đơn nhập đã được xử lý." });
+            return;
+        }
+
+        // Cập nhật hóa đơn nhập
+        purchaseInvoice = (
+            await HoaDonNhap.findByIdAndUpdate(id,
+                { ghiChu, tongTien },
+                { new: true }
+            )
+                .populate("nhaCungCapId")
+        )!
+            .map((invoice: any) => ({
+                ...invoice,
+                supplierId: invoice.nhaCungCapId._id,
+                ten: invoice.nhaCungCapId.ten
+            }));
+
+        // Cập nhật chi tiết hóa đơn nhập
+        const bulkOperations = detailPurchaseInvoices.map(detail => ({
+            updateOne: {
+                filter: { _id: detail._id },
+                update: {
+                    $set: {
+                        giaNhap: detail.giaNhap,
+                        soLuong: detail.soLuong,
+                        thanhTien: detail.thanhTien
+                    }
+                }
+            }
+        }));
+        await ChiTietHDN.bulkWrite(bulkOperations);
+
+        // Lấy danh sách chi tiết hóa đơn nhập sau khi cập nhật
+        const updatedDetailPurchaseInvoices = await ChiTietHDN.aggregate()
+            .match({ hoaDonNhapId: new mongoose.Types.ObjectId(id) })
+            .lookup({
+                from: "SanPhams",
+                localField: "sanPhamId",
+                foreignField: "_id",
+                as: "product"
+            })
+            .unwind("$product")
+            .project({
+                _id: 1,
+                giaNhap: 1,
+                soLuong: 1,
+                thanhTien: 1,
+                sanPhamId: "$product._id",
+                tenSP: "$product.tenSP",
+                imageUrl: "$product.imageUrl"
+            });
+
+        res.status(200).json({
+            message: "Cập nhật hóa đơn nhập thành công.",
+            purchaseInvoice: purchaseInvoice,
+            detailPurchaseInvoices: updatedDetailPurchaseInvoices
+        });
     } catch (err) {
         console.log(err);
         res.status(500).json({ message: "Lỗi hệ thống máy chủ." });
@@ -221,11 +314,11 @@ export const getDetailPurchaseInvoice = async (req: AuthenticatedRequest, res: R
             .unwind("$product")
             .project({
                 _id: 1,
+                giaNhap: 1,
                 soLuong: 1,
                 thanhTien: 1,
                 sanPhamId: "$product._id",
                 tenSP: "$product.tenSP",
-                giaNhap: "$product.giaNhap",
                 imageUrl: "$product.imageUrl"
             });
         res.status(200).json({

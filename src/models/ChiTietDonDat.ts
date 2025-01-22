@@ -14,7 +14,7 @@ const ChiTietDonDatSchema: Schema = new Schema({
     },
     giaBan: {
         type: Number,
-        required: true
+        default: 0
     },
     khuyenMai : {
         type: Number,

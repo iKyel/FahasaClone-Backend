@@ -224,6 +224,7 @@ export const getProducts = async (req: Request, res: Response) => {
                 sort.createdAt = 1;
                 break;
             default:
+                sort.createdAt = -1;
                 break;
         }
 

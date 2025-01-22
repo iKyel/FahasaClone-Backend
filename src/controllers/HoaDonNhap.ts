@@ -144,10 +144,26 @@ export const getAllPurchaseInvoices = async (req: AuthenticatedRequest, res: Res
         const totalInvoices = await HoaDonNhap.countDocuments();
         const totalPage = Math.ceil(totalInvoices / ITEMS_PER_PAGE);
 
-        // Lấy danh sách hóa đơn nhập theo trang hiện tại
-        const purchaseInvoices = await HoaDonNhap.find()
-            .skip((pageNum - 1) * ITEMS_PER_PAGE)
-            .limit(ITEMS_PER_PAGE);
+        // Lấy danh sách hóa đơn nhập theo trang hiện tại)
+        const purchaseInvoices = (
+            await HoaDonNhap.aggregate()
+                .sort({ createdAt: -1 })    // Sắp xếp theo thời gian tạo giảm dần
+                .lookup({
+                    from: "TaiKhoans",
+                    localField: "nhanVienId",
+                    foreignField: "_id",
+                    as: "staff"
+                })
+                .unwind("$staff")
+                .skip((pageNum - 1) * ITEMS_PER_PAGE)
+                .limit(ITEMS_PER_PAGE)
+        )
+            .map((invoice: any) => ({
+                ...invoice,
+                staff: undefined,
+                nhanVienId: invoice.staff._id,
+                tenNV: `${invoice.staff.hoDem} ${invoice.staff.ten}`
+            }));
 
         res.status(200).json({
             message: "Lấy danh sách hóa đơn nhập thành công.",

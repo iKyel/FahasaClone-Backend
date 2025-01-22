@@ -26,7 +26,7 @@ const ChiTietDonDatSchema: Schema = new Schema({
     },
     thanhTien: {
         type: Number,
-        required: true
+        default: 0
     },
     daChon: {
         type: Boolean,

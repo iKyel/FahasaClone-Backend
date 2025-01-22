@@ -100,3 +100,22 @@ export const deleteCategory = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Internal server error." });
   }
 };
+
+export const editCategoryName = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { ten } = req.body;
+
+  try {
+    const danhMuc = await DanhMuc.findById(id);
+    if (!danhMuc) {
+      return res.status(404).json({ message: "Không tìm thấy danh mục." });
+    }
+
+    danhMuc.ten = ten;
+    await danhMuc.save();
+
+    res.status(200).json({ message: "Tên danh mục đã được cập nhật thành công.", danhMuc });
+  } catch (error) {
+    res.status(500).json({ message: "Có lỗi xảy ra khi cập nhật tên danh mục.", error });
+  }
+};

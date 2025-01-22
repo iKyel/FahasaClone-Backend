@@ -398,12 +398,19 @@ export const createPaymentOrder = async (
     const selectedItems = await ChiTietDonDat.find({
       donDatId: currentCart._id,
       daChon: true,
-    });
+    }).populate("sanPhamId");
 
     if (selectedItems.length === 0) {
       return res
         .status(400)
         .json({ message: "Không có sản phẩm nào được chọn để thanh toán." });
+    }
+
+    // Assign each item with the price from the corresponding SanPham
+    for (const item of selectedItems) {
+      const product = item.sanPhamId as unknown as ISanPham;
+      item.giaBan = product.giaBan;
+      await item.save();
     }
 
     // Tính tổng tiền
@@ -640,16 +647,32 @@ export const staffGetSaleInvokes = async (
   res: Response
 ) => {
   try {
+    const pageNum = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const skip = (pageNum - 1) * limit;
+
     // Lấy tất cả đơn đặt (không phải giỏ hàng) từ database
     const saleInvoices = await DonDat.find({
       trangThaiDon: { $ne: "Giỏ hàng" },
-    }).sort({ createdAt: -1 }); // Sắp xếp theo ngày tạo giảm dần
+    })
+      .sort({ createdAt: -1 }) 
+      .skip(skip)
+      .limit(limit)
+      .populate<{ khachHangId: { _id: string; ten: string } }>('khachHangId', '_id ten');
 
-    const totalOrders = saleInvoices.length;
+    const totalOrders = await DonDat.countDocuments({
+      trangThaiDon: { $ne: "Giỏ hàng" },
+    });
 
     res.status(200).json({
-      saleInvoices,
-      soLuong: totalOrders,
+      saleInvoices: saleInvoices.map(invoice => ({
+        ...invoice.toObject(),
+        khachHangId: invoice.khachHangId._id,
+        tenKH: invoice.khachHangId.ten, 
+      })),
+      totalOrders,
+      totalPages: Math.ceil(totalOrders / limit),
+      currentPage: pageNum,
       message: "Lấy danh sách tất cả đơn đặt thành công!",
     });
   } catch (err) {
@@ -680,7 +703,7 @@ export const getSaleInvoiceDetail = async (
 
     // Tìm chi tiết đơn đặt hàng theo donDatId
     const detailSaleInvoices = await ChiTietDonDat.find({ donDatId: id })
-      .populate<{ sanPhamId: ISanPham }>("sanPhamId", "tenSP giaBan imageUrl")
+      .populate<{ sanPhamId: ISanPham }>("sanPhamId", "tenSP imageUrl")
       .exec();
 
     // Trả về thông tin hóa đơn và chi tiết hóa đơn
@@ -692,7 +715,7 @@ export const getSaleInvoiceDetail = async (
         thanhTien: detail.thanhTien,
         sanPhamId: detail.sanPhamId._id,
         tenSP: detail.sanPhamId.tenSP,
-        giaBan: detail.sanPhamId.giaBan,
+        giaBan: detail.giaBan,
         imageUrl: detail.sanPhamId.imageUrl,
       })),
     });
@@ -708,13 +731,19 @@ export const findSaleInvokes = async (
 ) => {
   try {
     const { id } = req.params;
+    const pageNum = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const skip = (pageNum - 1) * limit;
 
     const saleInvoices = await DonDat.find({
       $or: [
         { khachHangId: id }, // Tìm theo khachHangId
         { _id: id }, // Tìm theo DonDatId (hoaDonBanId)
       ],
-    }).exec();
+    })
+      .skip(skip)
+      .limit(limit)
+      .exec();
 
     // Nếu không có hóa đơn nào tìm thấy
     if (!saleInvoices || saleInvoices.length === 0) {
@@ -723,10 +752,9 @@ export const findSaleInvokes = async (
 
     // Tìm chi tiết đơn hàng từ ChiTietDonDat và populate thông tin sản phẩm
     const result = [];
-
     for (const saleInvoice of saleInvoices) {
-      const details = await ChiTietDonDat.find({ donDatId: id })
-        .populate<{ sanPhamId: ISanPham }>("sanPhamId", "tenSP giaBan imageUrl") // Populating thông tin sản phẩm từ bảng SanPham
+      const details = await ChiTietDonDat.find({ donDatId: saleInvoice._id })
+        .populate<{ sanPhamId: ISanPham }>("sanPhamId", "tenSP giaBan imageUrl")
         .exec();
 
       const detailSaleInvoices = details.map((detail) => ({
@@ -744,7 +772,20 @@ export const findSaleInvokes = async (
       });
     }
 
-    return res.json({ saleInvoices: result, message: "Tìm kiếm thành công" });
+    const totalOrders = await DonDat.countDocuments({
+      $or: [
+        { khachHangId: id },
+        { _id: id },
+      ],
+    });
+
+    return res.json({
+      saleInvoices: result,
+      totalOrders,
+      totalPages: Math.ceil(totalOrders / limit),
+      currentPage: pageNum,
+      message: "Tìm kiếm thành công",
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Có lỗi xảy ra, vui lòng thử lại" });

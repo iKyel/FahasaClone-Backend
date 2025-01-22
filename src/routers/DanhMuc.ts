@@ -1,10 +1,13 @@
 import express from "express";
 import {
-    addCategory,
-    getCategories,
-    getCategoryName
+  addCategory,
+  getCategories,
+  getCategoryName,
+  deleteCategory,
+  editCategoryName,
 } from "../controllers/DanhMuc";
 import { checkRoleStaff } from "../middlewares/authorizedUser";
+import verifyToken from "../middlewares/verifyToken";
 
 const router = express.Router();
 
@@ -26,5 +29,18 @@ router.get("/getCategories", getCategories);
  */
 router.get("/getCategoryName/:danhMucId", getCategoryName);
 
+router.delete(
+  "/deleteCategory/:id",
+  verifyToken,
+  checkRoleStaff,
+  deleteCategory
+);
+
+router.put(
+  "/editCategoryName/:id",
+  verifyToken,
+  checkRoleStaff,
+  editCategoryName
+);
 
 export default router;

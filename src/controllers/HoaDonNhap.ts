@@ -251,12 +251,22 @@ export const getAllPurchaseInvoices = async (req: AuthenticatedRequest, res: Res
                     as: "staff"
                 })
                 .unwind("$staff")
+                .lookup({
+                    from: "NhaCungCaps",
+                    localField: "nhaCungCapId",
+                    foreignField: "_id",
+                    as: "supplier"
+                })
+                .unwind("$supplier")
                 .skip((pageNum - 1) * limit)
                 .limit(limit)
         )
             .map((invoice: any) => ({
                 ...invoice,
                 staff: undefined,
+                supplier: undefined,
+                supplierId: invoice.supplier._id,
+                tenNCC: invoice.supplier.ten,
                 nhanVienId: invoice.staff._id,
                 tenNV: `${invoice.staff.hoDem} ${invoice.staff.ten}`
             }));

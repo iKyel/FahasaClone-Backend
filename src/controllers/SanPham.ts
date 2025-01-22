@@ -227,25 +227,29 @@ export const getProducts = async (req: Request, res: Response) => {
                 break;
         }
 
-        // Lấy tổng số trang sản phẩm thỏa mãn
-        const totalProducts = await SanPham.countDocuments(filter);
-        const totalPage = Math.ceil(totalProducts / ITEMS_PER_PAGE);
+        // Lấy danh sách sản phẩm thỏa mãn và tổng số trang
+        const [productsPerPage, productIds, totalProduct] = await Promise.all([
+            SanPham.find(filter)
+                .sort(sort)
+                .skip((pageNum - 1) * ITEMS_PER_PAGE)
+                .limit(ITEMS_PER_PAGE),
+            SanPham.find(filter)
+                .select('_id'),
+            SanPham.countDocuments(filter)
+        ]);
 
-        // Lấy danh sách sản phẩm thỏa mãn
-        const products = await SanPham.find(filter)
-            .sort(sort)
-            .skip((pageNum - 1) * ITEMS_PER_PAGE)
-            .limit(ITEMS_PER_PAGE);
-        if (products.length === 0) {
+        if (productsPerPage.length === 0) {
             res.status(404).json({ message: 'Không tìm thấy sản phẩm nào.' });
             return;
         }
 
-        const productIds = products.map(product => product._id);
+        // Lấy tổng số trang sản phẩm thỏa mãn
+        const totalPage = Math.ceil(totalProduct / ITEMS_PER_PAGE);
+
         // Lấy các đặc trưng và danh sách giá trị của đặc trưng đó dựa trên bảng DacTrung_SanPham
         const features = await DacTrung_SanPham.aggregate()
             .match({
-                sanPhamId: { $in: productIds }
+                sanPhamId: { $in: productIds.map(product => product._id) }
             })
             .lookup({
                 from: 'DacTrungs',
@@ -290,7 +294,7 @@ export const getProducts = async (req: Request, res: Response) => {
 
         res.status(200).json({
             message: 'Lấy danh sách sản phẩm thành công.',
-            products,
+            products: productsPerPage,
             totalPage,
             features,
             suppliers

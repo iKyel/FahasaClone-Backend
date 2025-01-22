@@ -232,10 +232,13 @@ export const cancelPurchaseInvoice = async (req: AuthenticatedRequest, res: Resp
  */
 export const getAllPurchaseInvoices = async (req: AuthenticatedRequest, res: Response) => {
     try {
-        const { pageNum = 1 } = req.query as unknown as { pageNum: number };
+        const { pageNum = 1, limit = 24 } = req.query as unknown as { 
+            pageNum: number,
+            limit: number
+        };
         // Lấy tổng số trang hóa đơn nhập
         const totalInvoices = await HoaDonNhap.countDocuments();
-        const totalPage = Math.ceil(totalInvoices / ITEMS_PER_PAGE);
+        const totalPage = Math.ceil(totalInvoices / limit);
 
         // Lấy danh sách hóa đơn nhập theo trang hiện tại)
         const purchaseInvoices = (
@@ -248,8 +251,8 @@ export const getAllPurchaseInvoices = async (req: AuthenticatedRequest, res: Res
                     as: "staff"
                 })
                 .unwind("$staff")
-                .skip((pageNum - 1) * ITEMS_PER_PAGE)
-                .limit(ITEMS_PER_PAGE)
+                .skip((pageNum - 1) * limit)
+                .limit(limit)
         )
             .map((invoice: any) => ({
                 ...invoice,

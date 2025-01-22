@@ -11,10 +11,6 @@ const SanPhamSchema: Schema = new Schema(
             type: Number,
             required: true
         },
-        giaNhap: {
-            type: Number,
-            required: true
-        },
         soLuong: {
             type: Number,
             default: 0

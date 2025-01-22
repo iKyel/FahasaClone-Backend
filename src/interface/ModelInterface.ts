@@ -19,7 +19,6 @@ export interface ITaiKhoan extends Document {
 export interface ISanPham extends Document {
   tenSP: string;
   giaBan: number;
-  giaNhap: number;
   soLuong: number;
   trongLuong: number;
   kichThuoc: {
@@ -119,6 +118,7 @@ export interface IHoaDonNhap extends Document {
 export interface IChiTietHDN extends Document {
   hoaDonNhapId: mongoose.Types.ObjectId;
   sanPhamId: mongoose.Types.ObjectId;
+  giaNhap: number;
   soLuong: number;
   thanhTien: number;
 }

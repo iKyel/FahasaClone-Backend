@@ -20,10 +20,35 @@ export const getCart = async (req: AuthenticatedRequest, res: Response) => {
     // Tìm giỏ hàng của người dùng, nếu không có thì tạo mới
     const cart = await getUserCart(user._id);
     const cartDetail = await getUserCartDetail(cart?._id);
+
+    // Lấy danh sách các sản phẩm trong giỏ hàng
+    let productInCart = cartDetail.map((item) => ({
+        _id: item._id,
+        giaBan: item.giaBan,
+        soLuong: item.soLuong,
+        thanhTien: Math.round((item.giaBan - (item.giaBan * item.khuyenMai) / 100) * item.soLuong)
+    }));
+
+    // Cập nhật lại giá bán, số lượng và thành tiền của sản phẩm trong giỏ hàng
+    const bulkWrite = productInCart.map((item) => ({
+        updateOne: {
+            filter: { _id: item._id },
+            update: { 
+              $set: {
+                giaBan: item.giaBan,
+                soLuong: item.soLuong,
+                thanhTien: item.thanhTien 
+              }
+            },
+        },
+    }));
+    await ChiTietDonDat.bulkWrite(bulkWrite);
+    const newCartDetail = await getUserCartDetail(cart?._id);
+
     res.status(200).json({
       message: "Lấy thông tin giỏ hàng thành công!",
       cart,
-      cartDetail,
+      cartDetail: newCartDetail,
     });
   } catch (err) {
     console.log(err);

@@ -14,7 +14,8 @@ import {
     customerGetSaleInvokes,
     staffGetSaleInvokes,
     getSaleInvoiceDetail,
-    findSaleInvokes
+    findSaleInvokes,
+    editOrder
 } from '../controllers/DonDat';
 
 const router = express.Router();
@@ -64,5 +65,7 @@ router.get("/staffGetSaleInvokes", verifyToken, checkRoleStaff, staffGetSaleInvo
 router.get("/getSaleInvoikeDetail/:id", verifyToken, getSaleInvoiceDetail);
 
 router.get("/findSaleInvoices/:id", verifyToken, findSaleInvokes);
+
+router.put("/editOrder/:id", verifyToken, editOrder);
 
 export default router;

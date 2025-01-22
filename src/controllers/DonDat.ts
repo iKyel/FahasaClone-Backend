@@ -716,6 +716,7 @@ export const getSaleInvoiceDetail = async (
         sanPhamId: detail.sanPhamId._id,
         tenSP: detail.sanPhamId.tenSP,
         giaBan: detail.giaBan,
+        khuyenMai: detail.khuyenMai,
         imageUrl: detail.sanPhamId.imageUrl,
       })),
     });
@@ -791,3 +792,59 @@ export const findSaleInvokes = async (
     res.status(500).json({ message: "Có lỗi xảy ra, vui lòng thử lại" });
   }
 };
+
+export const editOrder = async (req: AuthenticatedRequest, res: Response) => {
+  const { id } = req.params;
+  const { diaChiDatHang, ptVanChuyen } = req.body;
+
+  try {
+    // Find the order by ID
+    const order = await DonDat.findById(id);
+    if (!order) {
+      return res.status(404).json({ message: "Không tìm thấy đơn đặt hàng." });
+    }
+  
+    // Check if the order status is "Chờ xác nhận"
+    if (order.trangThaiDon !== "Chờ xác nhận") {
+      return res.status(400).json({ message: "Đơn đặt hàng không ở trạng thái chờ xác nhận." });
+    }
+
+    // Update the order details
+    if (diaChiDatHang) order.diaChiDatHang = diaChiDatHang;
+    if (ptVanChuyen) order.ptVanChuyen = ptVanChuyen;
+    await order.save();
+
+    // Get all order details
+    const detailSaleInvoices = await ChiTietDonDat.find({ donDatId: id }).populate("sanPhamId");
+
+    // Format the order details
+    const formattedDetails = detailSaleInvoices.map((detail) => {
+      const product = detail.sanPhamId as unknown as typeof SanPham & {
+        _id: string;
+        tenSP: string;
+        giaBan: number;
+        khuyenMai: number;
+        imageUrl: string;
+      };
+
+      return {
+        _id: detail._id,
+        soLuong: detail.soLuong,
+        thanhTien: detail.thanhTien,
+        sanPhamId: product._id,
+        tenSP: product.tenSP,
+        giaBan: product.giaBan,
+        khuyenMai: product.khuyenMai,
+        imageUrl: product.imageUrl,
+      };
+    });
+
+    res.status(200).json({
+      saleInvoice: order,
+      detailSaleInvoices: formattedDetails,
+    });
+  } catch (error) {
+    console.error("Error editing order:", error);
+    res.status(500).json({ message: "Có lỗi xảy ra, vui lòng thử lại." });
+  }
+}

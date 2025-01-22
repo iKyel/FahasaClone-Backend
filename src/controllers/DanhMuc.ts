@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import DanhMuc from "../models/DanhMuc";
+import mongoose from "mongoose";
+import SanPham from "../models/SanPham";
 
 // Thêm danh mục
 export const addCategory = async (req: Request, res: Response) => {
@@ -58,5 +60,44 @@ export const getCategoryName = async (req: Request, res: Response) => {
       message: "Có lỗi xảy ra khi lấy thông tin danh mục.",
       error,
     });
+  }
+};
+
+export const deleteCategory = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    console.log(id)
+
+    // get all subcategories recursively
+    const getSubcategories = async (parentId: mongoose.Types.ObjectId) => {
+      const subcategories = await DanhMuc.find({ parentId });
+      let allSubcategories = [...subcategories];
+      for (const subcategory of subcategories) {
+        const subSubcategories = await getSubcategories(subcategory._id);
+        allSubcategories = [...allSubcategories, ...subSubcategories];
+      }
+      return allSubcategories;
+    };
+
+    // Get all subcategories 
+    const subcategories = await getSubcategories(new mongoose.Types.ObjectId(id));
+
+    const categoriesToCheck = [id, ...subcategories.map(cat => cat._id)];
+    const products = await SanPham.find({ danhMucId: { $in: categoriesToCheck } });
+
+    if (products.length > 0) {
+      return res.status(400).json({ message: "Không thể xoá danh mục chứa sản phẩm." });
+    }
+
+    // Delete all subcategories
+    await DanhMuc.deleteMany({ _id: { $in: subcategories.map(cat => cat._id) } });
+
+    // Delete the main category
+    await DanhMuc.findByIdAndDelete(id);
+
+    res.status(200).json({ message: "Xoá danh mục và các adnh mục con thành công" });
+  } catch (error) {
+    console.error("Error deleting category:", error);
+    res.status(500).json({ message: "Internal server error." });
   }
 };

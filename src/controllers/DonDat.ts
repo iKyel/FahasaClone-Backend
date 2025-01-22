@@ -648,16 +648,21 @@ export const staffGetSaleInvokes = async (
     const saleInvoices = await DonDat.find({
       trangThaiDon: { $ne: "Giỏ hàng" },
     })
-      .sort({ createdAt: -1 }) // Sắp xếp theo ngày tạo giảm dần
+      .sort({ createdAt: -1 }) 
       .skip(skip)
-      .limit(limit);
+      .limit(limit)
+      .populate<{ khachHangId: { _id: string; ten: string } }>('khachHangId', '_id ten');
 
     const totalOrders = await DonDat.countDocuments({
       trangThaiDon: { $ne: "Giỏ hàng" },
     });
 
     res.status(200).json({
-      saleInvoices,
+      saleInvoices: saleInvoices.map(invoice => ({
+        ...invoice.toObject(),
+        khachHangId: invoice.khachHangId._id,
+        tenKH: invoice.khachHangId.ten, 
+      })),
       totalOrders,
       totalPages: Math.ceil(totalOrders / limit),
       currentPage: pageNum,

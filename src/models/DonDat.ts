@@ -17,6 +17,7 @@ const DonDatSchema: Schema = new Schema(
             enum: [
                 "Giỏ hàng",
                 "Chờ xác nhận",
+                "Đã xác nhận",
                 "Hoàn thành",
                 "Đã hủy",
             ],

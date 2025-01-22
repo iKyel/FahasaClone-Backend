@@ -12,6 +12,10 @@ const ChiTietHDNSchema: Schema = new Schema({
         ref: "SanPham",
         required: true
     },
+    giaNhap: {
+        type: Number,
+        required: true
+    },
     soLuong: {
         type: Number,
         required: true

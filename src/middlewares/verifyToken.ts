@@ -22,6 +22,11 @@ async function verifyToken(req: AuthenticatedRequest, res: Response, next: NextF
             if (!user) {
                 res.status(401).json({ message: 'Token không hợp lệ: Không thấy người dùng!' });
             } else {
+                // Check if user is active?
+                if (!user.trangThai) {
+                    res.status(401).json({ message: 'Tài khoản của bạn đã bị khóa!' });
+                    return;
+                }
                 // If Oke, then store 'user' in request and move to next middleware
                 req.user = user;
                 next();

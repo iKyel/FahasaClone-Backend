@@ -60,6 +60,11 @@ export const login = async (req: Request, res: Response) => {
             if (isMatch) {
                 // Ktra loaiTK có khớp với trong csdl?
                 if (loaiTK === user.loaiTK) {
+                    // Kiểm tra tài khoản có bị khóa không
+                    if (!user.trangThai) {
+                        res.status(401).json({ message: 'Tài khoản của bạn đã bị khóa!' });
+                        return;
+                    }
                     // Nếu khớp, tạo token và gửi về client qua cookie
                     const token = jwt.sign(
                         {

@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import NhaCungCap from "../models/NhaCungCap";
 import DanhMuc from "../models/DanhMuc";
+import HoaDonNhap from "../models/HoaDonNhap";
 
 export const addSupplier = async (req: Request, res: Response) => {
   try {
@@ -28,6 +29,62 @@ export const addSupplier = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Error adding supplier:", error);
     return res.status(500).json({ message: "Lỗi khi thêm nhà cung cấp." });
+  }
+};
+
+export const updateSupplier = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { ten } = req.body as { ten: string };
+
+    // Kiểm tra xem nhà cung cấp có tồn tại hay không
+    const supplier = await NhaCungCap.findById(id);
+    if (!supplier) {
+      return res.status(404).json({ message: "Nhà cung cấp không tồn tại." });
+    }
+
+    // Cập nhật thông tin nhà cung cấp
+    const newSupplier = await NhaCungCap.findByIdAndUpdate(
+        id, 
+        { ten },
+        { new: true }
+    );
+
+    return res.status(200).json({ 
+        message: "Cập nhật nhà cung cấp thành công.",
+        supplier: newSupplier,
+    });
+  } catch (error) {
+    console.error("Error updating supplier:", error);
+    return res.status(500).json({ message: "Lỗi khi cập nhật nhà cung cấp." });
+  }
+};
+
+export const deleteSupplier = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    // Kiểm tra xem nhà cung cấp có tồn tại hay không
+    const supplier = await NhaCungCap.findById(id);
+    if (!supplier) {
+      res.status(404).json({ message: "Nhà cung cấp không tồn tại." });
+      return;
+    }
+
+    // Kiểm tra xem nhà cung cấp có Hóa đơn nhập nào không
+    const supplierHasPurchaseInvoice = await HoaDonNhap.findOne({ nhaCungCapId: id });
+    if (supplierHasPurchaseInvoice) {
+      res.status(400).json({ message: "Nhà cung cấp đã có hóa đơn nhập, không thể xóa." });
+      return;
+    }
+
+    // Xóa nhà cung cấp
+    await NhaCungCap.findByIdAndDelete(id);
+
+    return res.status(200).json({ message: "Xóa nhà cung cấp thành công." });
+  } catch (error) {
+    console.error("Error deleting supplier:", error);
+    return res.status(500).json({ message: "Lỗi khi xóa nhà cung cấp." });
   }
 };
 

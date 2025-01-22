@@ -398,18 +398,19 @@ export const createPaymentOrder = async (
     const selectedItems = await ChiTietDonDat.find({
       donDatId: currentCart._id,
       daChon: true,
-    });
-
-    for (const item of selectedItems) {
-      const product = item.sanPhamId as unknown as ISanPham;
-      item.giaBan = product.giaBan;
-      await item.save();
-    }
+    }).populate("sanPhamId");
 
     if (selectedItems.length === 0) {
       return res
         .status(400)
         .json({ message: "Không có sản phẩm nào được chọn để thanh toán." });
+    }
+
+    // Assign each item with the price from the corresponding SanPham
+    for (const item of selectedItems) {
+      const product = item.sanPhamId as unknown as ISanPham;
+      item.giaBan = product.giaBan;
+      await item.save();
     }
 
     // Tính tổng tiền

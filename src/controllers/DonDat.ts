@@ -529,7 +529,7 @@ export const completeOrder = async (
     await order.save();
 
     // Lấy danh sách tất cả đơn đặt hàng và tổng số lượng sản phẩm
-    const allOrders = await DonDat.find({ trangThaiDon: { $ne: "Giỏ hàng" } }, { createdAt: 1 });
+    const allOrders = await DonDat.find({ trangThaiDon: { $ne: "Giỏ hàng" } }, { createdAt: -1 });
     const ordersWithQuantities = await Promise.all(
       allOrders.map(async (order) => {
         const orderDetails = await ChiTietDonDat.find({ donDatId: order._id });
@@ -577,7 +577,7 @@ export const confirmOrder = async (
     await order.save();
 
     // Lấy danh sách tất cả đơn đặt hàng và tổng số lượng sản phẩm
-    const allOrders = await DonDat.find({ trangThaiDon: { $ne: "Giỏ hàng" } }, { createdAt: 1 });
+    const allOrders = await DonDat.find({ trangThaiDon: { $ne: "Giỏ hàng" } }, { createdAt: -1 });
     const ordersWithQuantities = await Promise.all(
       allOrders.map(async (order) => {
         const orderDetails = await ChiTietDonDat.find({ donDatId: order._id });

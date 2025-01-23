@@ -406,7 +406,7 @@ export const createPaymentOrder = async (
     const { diaChi, ptVanChuyen, ptThanhToan, ghiChu } = req.body;
     const khachHangId = req.user?._id;
     if (!diaChi) {
-      return res.status(400).json({ message: "Địa chỉ đặt hàng là bắt buộc" });
+      return res.status(400).json({ message: "Hãy vào trang thông tin cá nhân để cập nhật lại địa chỉ" });
     }
 
     // Lấy các sản phẩm đã chọn trong giỏ hàng

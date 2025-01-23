@@ -58,3 +58,5 @@ connectDB();
 app.listen(port, () => {
     console.log(`Server dang chay tren cong http://localhost:${port}`);
 });
+
+export default app;

@@ -2,7 +2,6 @@ import express from "express";
 import {
     register,
     login,
-    logout,
     getAccount,
     updateAccount,
     createAddress,
@@ -32,11 +31,6 @@ router.post("/register", register);
  */
 router.post("/login", login);
 
-/**
- * @route       GET '/api/account/logout'
- * @description Đăng xuất khỏi tài khoản
- */
-router.get("/logout", verifyToken, logout);
 
 /**
  * @route       GET '/api/account/getAccount'

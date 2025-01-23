@@ -76,17 +76,13 @@ export const login = async (req: Request, res: Response) => {
                             expiresIn: '1d'
                         }
                     );
-                    res.cookie('token', token, {
-                        httpOnly: true,
-                        secure: false,
-                        maxAge: 24 * 60 * 60 * 1000     // 1 day in milliseconds
-                    });
                     res.status(200).json({
                         message: 'Đăng nhập thành công!',
                         user: {
                             ...user._doc,
                             password: undefined
-                        }
+                        },
+                        token: token
                     });
                     return;
                 }
@@ -100,16 +96,6 @@ export const login = async (req: Request, res: Response) => {
     }
 };
 
-/**
- * @description Đăng xuất khỏi tài khoản
- * @param {AuthenticatedRequest} req - Request object
- * @param {Response} res - Response object
- * @returns message
- */
-export const logout = async (req: AuthenticatedRequest, res: Response) => {
-    res.clearCookie('token');
-    res.status(200).json({ message: 'Đăng xuất thành công!' });
-};
 
 /**
  * @description Lấy thông tin tài khoản

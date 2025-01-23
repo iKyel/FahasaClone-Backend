@@ -14,7 +14,7 @@ const ChiTietHDNSchema: Schema = new Schema({
     },
     giaNhap: {
         type: Number,
-        required: true
+        default: 0
     },
     soLuong: {
         type: Number,
@@ -22,7 +22,7 @@ const ChiTietHDNSchema: Schema = new Schema({
     },
     thanhTien: {
         type: Number,
-        required: true
+        default: 0
     },
 });
 

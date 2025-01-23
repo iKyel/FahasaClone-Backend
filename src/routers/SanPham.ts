@@ -4,7 +4,8 @@ import {
     updateProduct,
     searchProduct,
     getProducts,
-    getProductDetail
+    getProductDetail,
+    getAllProducts
 } from '../controllers/SanPham';
 import verifyToken from '../middlewares/verifyToken';
 import { checkRoleStaff } from '../middlewares/authorizedUser';
@@ -37,6 +38,12 @@ router.get("/searchProduct", searchProduct);
  * @query       danhMucId, dacTrung_sanPhamId, nhaCungCapId, price, orderBy, pageNum   
  */
 router.get("/getProducts", getProducts);
+
+/**
+ * @route       GET '/api/product/getAllProducts'
+ * @description Lấy danh sách tất cả sản phẩm
+ */
+router.get("/getAllProducts", getAllProducts);
 
 /**
  * @route       GET '/api/product/getProductDetail/:id'

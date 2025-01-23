@@ -5,7 +5,8 @@ import {
     createPurchaseInvoice,
     getAllPurchaseInvoices,
     getDetailPurchaseInvoice,
-    searchInvoice
+    searchInvoice,
+    updatePurchaseInvoice
 } from '../controllers/HoaDonNhap';
 import verifyToken from '../middlewares/verifyToken';
 import { checkRoleStaff } from '../middlewares/authorizedUser';
@@ -17,6 +18,15 @@ const router = express.Router();
  * @description Tạo hóa đơn nhập
  */
 router.post("/create", verifyToken, checkRoleStaff, createPurchaseInvoice);
+
+/**
+ * @route       PUT '/api/purchaseInvoice/update/:id'
+ * @description Sửa hóa đơn nhập ở trạng thái "Chờ xác nhận"
+ * @param       id - id của hóa đơn nhập
+ * @body        ghiChu? - ghi chú
+ *              detailPurchaseInvoices? - mảng chi tiết hóa đơn nhập
+ */
+router.put("/update/:id", verifyToken, checkRoleStaff, updatePurchaseInvoice);
 
 /**
  * @route       PATCH '/api/purchaseInvoice/confirm/:id'

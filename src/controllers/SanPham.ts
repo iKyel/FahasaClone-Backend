@@ -224,6 +224,7 @@ export const getProducts = async (req: Request, res: Response) => {
                 sort.createdAt = 1;
                 break;
             default:
+                sort.createdAt = -1;
                 break;
         }
 
@@ -299,6 +300,26 @@ export const getProducts = async (req: Request, res: Response) => {
             features,
             suppliers
         });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ message: 'Lỗi hệ thống máy chủ.' });
+    }
+}
+
+/**
+ * @description Lấy danh sách tất cả sản phẩm
+ * @param {Request} req - Request object
+ * @param {Response} res - Response object
+ * @returns message, products
+ */
+export const getAllProducts = async (req: Request, res: Response) => {
+    try {
+        const products = await SanPham.find();
+        if (products.length === 0) {
+            res.status(404).json({ message: 'Không tìm thấy sản phẩm nào.' });
+            return;
+        }
+        res.status(200).json({ message: 'Lấy danh sách sản phẩm thành công.', products });
     } catch (err) {
         console.log(err);
         res.status(500).json({ message: 'Lỗi hệ thống máy chủ.' });

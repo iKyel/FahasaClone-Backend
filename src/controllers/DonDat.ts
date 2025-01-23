@@ -511,6 +511,7 @@ export const completeOrder = async (
 ) => {
   try {
     const { id } = req.params;
+    const userId = req.user?._id;
 
     // Tìm đơn đặt hàng theo ID
     const order = await DonDat.findById(id);
@@ -528,7 +529,7 @@ export const completeOrder = async (
     await order.save();
 
     // Lấy danh sách tất cả đơn đặt hàng và tổng số lượng sản phẩm
-    const allOrders = await DonDat.find({ trangThaiDon: { $ne: "Giỏ hàng" } }).sort({ createdAt: -1 });
+    const allOrders = await DonDat.find({ khachHangId: userId, trangThaiDon: { $ne: "Giỏ hàng" } }).sort({ createdAt: -1 });
     const ordersWithQuantities = await Promise.all(
       allOrders.map(async (order) => {
         const orderDetails = await ChiTietDonDat.find({ donDatId: order._id });

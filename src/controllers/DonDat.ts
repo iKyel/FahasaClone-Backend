@@ -435,6 +435,7 @@ export const createPaymentOrder = async (
     for (const item of selectedItems) {
       const product = item.sanPhamId as unknown as ISanPham;
       item.giaBan = product.giaBan;
+      item.khuyenMai = product.khuyenMai;
       await item.save();
     }
 
@@ -914,8 +915,8 @@ export const editOrder = async (req: AuthenticatedRequest, res: Response) => {
         thanhTien: detail.thanhTien,
         sanPhamId: product._id,
         tenSP: product.tenSP,
-        giaBan: product.giaBan,
-        khuyenMai: product.khuyenMai,
+        giaBan: detail.giaBan,
+        khuyenMai: detail.khuyenMai,
         imageUrl: product.imageUrl,
       };
     });

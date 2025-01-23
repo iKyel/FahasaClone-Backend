@@ -5,18 +5,11 @@ import HoaDonNhap from "../models/HoaDonNhap";
 
 export const addSupplier = async (req: Request, res: Response) => {
   try {
-    const { ten, danhMucId } = req.body;
-
-    // Kiểm tra xem danh mục có tồn tại hay không
-    const danhMuc = await DanhMuc.findById(danhMucId);
-    if (!danhMuc) {
-      return res.status(404).json({ message: "Danh mục không tồn tại." });
-    }
+    const { ten } = req.body;
 
     // Tạo mới nhà cung cấp
     const newSupplier = new NhaCungCap({
-      ten,
-      danhMucId,
+      ten
     });
 
     // Lưu nhà cung cấp vào cơ sở dữ liệu
@@ -81,7 +74,13 @@ export const deleteSupplier = async (req: Request, res: Response) => {
     // Xóa nhà cung cấp
     await NhaCungCap.findByIdAndDelete(id);
 
-    return res.status(200).json({ message: "Xóa nhà cung cấp thành công." });
+    // Lấy danh sách tất cả nhà cung cấp sau khi xóa
+    const suppliers = await NhaCungCap.find();
+
+    return res.status(200).json({ 
+      message: "Xóa nhà cung cấp thành công.",
+      suppliers
+    });
   } catch (error) {
     console.error("Error deleting supplier:", error);
     return res.status(500).json({ message: "Lỗi khi xóa nhà cung cấp." });

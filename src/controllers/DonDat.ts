@@ -20,7 +20,6 @@ export const getCart = async (req: AuthenticatedRequest, res: Response) => {
     // Tìm giỏ hàng của người dùng, nếu không có thì tạo mới
     const cart = await getUserCart(user._id);
     const cartDetail = await getUserCartDetail(cart?._id);
-
     // Lấy danh sách các sản phẩm trong giỏ hàng
     let productInCart = cartDetail.map((item) => ({
         _id: item._id,

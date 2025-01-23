@@ -74,7 +74,7 @@ export const updatePurchaseInvoice = async (req: AuthenticatedRequest, res: Resp
         };
 
         // Kiểm tra hóa đơn nhập có tồn tại không
-        let purchaseInvoice = await HoaDonNhap.findById(id);
+        let purchaseInvoice: any = await HoaDonNhap.findById(id);
         if (!purchaseInvoice) {
             res.status(404).json({ message: "Không tìm thấy hóa đơn nhập." });
             return;
@@ -94,9 +94,9 @@ export const updatePurchaseInvoice = async (req: AuthenticatedRequest, res: Resp
         )!
         purchaseInvoice = {
             ...purchaseInvoice.toJSON(),
-            nhaCungCapId: undefined as any,
+            nhaCungCapId: undefined,
             supplierId: purchaseInvoice.nhaCungCapId._id,
-            ten: (purchaseInvoice.nhaCungCapId as any).ten
+            ten: purchaseInvoice.nhaCungCapId.ten
         };
 
         // Cập nhật chi tiết hóa đơn nhập

@@ -529,13 +529,23 @@ export const completeOrder = async (
     await order.save();
 
     // Lấy danh sách tất cả đơn đặt hàng và tổng số lượng sản phẩm
-    const allOrders = await DonDat.find({ trangThaiDon: { $ne: "Giỏ hàng" } }, { createdAt: -1 });
+    const allOrders = await DonDat.find({ trangThaiDon: { $ne: "Giỏ hàng" } }).sort({ createdAt: -1 });
     const ordersWithQuantities = await Promise.all(
       allOrders.map(async (order) => {
         const orderDetails = await ChiTietDonDat.find({ donDatId: order._id });
         const soLuong = orderDetails.reduce((sum, detail) => sum + detail.soLuong, 0);
         return {
-          ...order.toObject(),
+          _id: order._id,
+          nhanVienId: order.nhanVienId,
+          khachHangId: order.khachHangId,
+          trangThaiDon: order.trangThaiDon,
+          ptVanChuyen: order.ptVanChuyen,
+          ptThanhToan: order.ptThanhToan,
+          ghiChu: order.ghiChu,
+          tongTien: order.tongTien,
+          diaChiDatHang: order.diaChiDatHang,
+          createdAt: order.createdAt,
+          updatedAt: order.updatedAt,
           soLuong
         };
       })
@@ -577,14 +587,24 @@ export const confirmOrder = async (
     await order.save();
 
     // Lấy danh sách tất cả đơn đặt hàng và tổng số lượng sản phẩm
-    const allOrders = await DonDat.find({ trangThaiDon: { $ne: "Giỏ hàng" } }, { createdAt: -1 });
+    const allOrders = await DonDat.find({ trangThaiDon: { $ne: "Giỏ hàng" } }).sort({ createdAt: -1 });
     const ordersWithQuantities = await Promise.all(
       allOrders.map(async (order) => {
         const orderDetails = await ChiTietDonDat.find({ donDatId: order._id });
         const soLuong = orderDetails.reduce((sum, detail) => sum + detail.soLuong, 0);
         return {
-          ...order.toObject(),
-          soLuong,
+          _id: order._id,
+          nhanVienId: order.nhanVienId,
+          khachHangId: order.khachHangId,
+          trangThaiDon: order.trangThaiDon,
+          ptVanChuyen: order.ptVanChuyen,
+          ptThanhToan: order.ptThanhToan,
+          ghiChu: order.ghiChu,
+          tongTien: order.tongTien,
+          diaChiDatHang: order.diaChiDatHang,
+          createdAt: order.createdAt,
+          updatedAt: order.updatedAt,
+          soLuong
         };
       })
     );

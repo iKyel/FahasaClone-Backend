@@ -30,7 +30,7 @@ const port = process.env.PORT || 3412;
 app.use(cors({
     origin: ['http://localhost:3000', 'http://localhost:8000'],
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-    allowedHeaders: ['Content-Type'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
 }));    // sử dụng CORS Middleware
 app.use(morgan('dev'));     // HTTP request logger

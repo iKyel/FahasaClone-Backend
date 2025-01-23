@@ -28,7 +28,7 @@ const port = process.env.PORT || 3412;
 
 // Using middleware
 app.use(cors({
-    origin: 'http://localhost:3000',
+    origin: ['http://localhost:3000', 'http://192.168.100.16:3000'],
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     allowedHeaders: ['Content-Type'],
     credentials: true

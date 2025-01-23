@@ -62,11 +62,12 @@ export const createPurchaseInvoice = async (req: AuthenticatedRequest, res: Resp
 export const updatePurchaseInvoice = async (req: AuthenticatedRequest, res: Response) => {
     try {
         const { id } = req.params;      // id của hóa đơn nhập
-        const { ghiChu = "", tongTien, detailPurchaseInvoices } = req.body as unknown as {
+        const { supplierId, ghiChu = "", tongTien, detailPurchaseInvoices } = req.body as unknown as {
+            supplierId: string,
             ghiChu: string,
             tongTien: number,
             detailPurchaseInvoices: Array<{
-                _id: string,
+                productId: string,
                 giaNhap: number,
                 soLuong: number,
                 thanhTien: number
@@ -87,7 +88,7 @@ export const updatePurchaseInvoice = async (req: AuthenticatedRequest, res: Resp
         // Cập nhật hóa đơn nhập
         purchaseInvoice = (
             await HoaDonNhap.findByIdAndUpdate(id,
-                { ghiChu, tongTien },
+                { ghiChu, tongTien, nhaCungCapId: supplierId },
                 { new: true }
             )
                 .populate("nhaCungCapId")
@@ -100,19 +101,34 @@ export const updatePurchaseInvoice = async (req: AuthenticatedRequest, res: Resp
         };
 
         // Cập nhật chi tiết hóa đơn nhập
-        const bulkOperations = detailPurchaseInvoices.map(detail => ({
-            updateOne: {
-                filter: { _id: detail._id },
-                update: {
-                    $set: {
-                        giaNhap: detail.giaNhap,
-                        soLuong: detail.soLuong,
-                        thanhTien: detail.thanhTien
-                    }
-                }
-            }
-        }));
-        await ChiTietHDN.bulkWrite(bulkOperations);
+        await ChiTietHDN.deleteMany({ hoaDonNhapId: id });
+        await ChiTietHDN.create(
+            detailPurchaseInvoices.map(detail => ({
+                hoaDonNhapId: id,
+                sanPhamId: detail.productId,
+                giaNhap: detail.giaNhap,
+                soLuong: detail.soLuong,
+                thanhTien: detail.thanhTien
+            }))
+        );
+        // const bulkOperations = detailPurchaseInvoices.map(detail => ({
+        //     updateOne: {
+        //         filter: { _id: detail._id },
+        //         update: {
+        //             $setOnInsert: {
+        //                 sanPhamId: detail.productId,
+        //                 hoaDonNhapId: id
+        //             },
+        //             $set: {
+        //                 giaNhap: detail.giaNhap,
+        //                 soLuong: detail.soLuong,
+        //                 thanhTien: detail.thanhTien
+        //             }
+        //         },
+        //         upsert: true
+        //     }
+        // }));
+        // await ChiTietHDN.bulkWrite(bulkOperations);
 
         // Lấy danh sách chi tiết hóa đơn nhập sau khi cập nhật
         const updatedDetailPurchaseInvoices = await ChiTietHDN.aggregate()
@@ -233,7 +249,7 @@ export const cancelPurchaseInvoice = async (req: AuthenticatedRequest, res: Resp
  */
 export const getAllPurchaseInvoices = async (req: AuthenticatedRequest, res: Response) => {
     try {
-        const { pageNum = 1, limit = 24 } = req.query as unknown as { 
+        const { pageNum = 1, limit = 24 } = req.query as unknown as {
             pageNum: number,
             limit: number
         };

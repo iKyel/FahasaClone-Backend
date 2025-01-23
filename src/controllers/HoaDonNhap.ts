@@ -92,11 +92,12 @@ export const updatePurchaseInvoice = async (req: AuthenticatedRequest, res: Resp
             )
                 .populate("nhaCungCapId")
         )!
-            .map((invoice: any) => ({
-                ...invoice,
-                supplierId: invoice.nhaCungCapId._id,
-                ten: invoice.nhaCungCapId.ten
-            }));
+        purchaseInvoice = {
+            ...purchaseInvoice.toJSON(),
+            nhaCungCapId: undefined as any,
+            supplierId: purchaseInvoice.nhaCungCapId._id,
+            ten: (purchaseInvoice.nhaCungCapId as any).ten
+        };
 
         // Cập nhật chi tiết hóa đơn nhập
         const bulkOperations = detailPurchaseInvoices.map(detail => ({

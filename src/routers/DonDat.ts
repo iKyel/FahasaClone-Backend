@@ -53,7 +53,7 @@ router.get("/getSelectedProduct", verifyToken, checkRoleCustomer, getSelectedPro
 
 router.post("/createPaymentOrder", verifyToken, checkRoleCustomer, createPaymentOrder);
 
-router.patch("/completeOrder/:id", verifyToken, checkRoleStaff, completeOrder);
+router.patch("/completeOrder/:id", verifyToken, completeOrder);
 
 router.patch("/cancelOrder/:id", verifyToken, cancelOrder);
 

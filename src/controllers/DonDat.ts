@@ -520,23 +520,30 @@ export const completeOrder = async (
 
     // Kiểm tra trạng thái đơn đặt hàng hiện tại
     if (order.trangThaiDon !== "Đã xác nhận") {
-      return res
-        .status(400)
-        .json({ message: "Trạng thái đơn đặt hàng không hợp lệ để cập nhật." });
+      return res.status(400).json({ message: "Trạng thái đơn đặt hàng không hợp lệ." });
     }
 
     // Cập nhật trạng thái thành "Hoàn thành"
     order.trangThaiDon = "Hoàn thành";
     await order.save();
 
-    // Lấy danh sách tất cả đơn đặt hàng và tổng số lượng
-    const allOrders = await DonDat.find();
-    const totalOrders = allOrders.length;
+    // Lấy danh sách tất cả đơn đặt hàng và tổng số lượng sản phẩm
+    const allOrders = await DonDat.find({ trangThaiDon: { $ne: "Giỏ hàng" } });
+    const ordersWithQuantities = await Promise.all(
+      allOrders.map(async (order) => {
+        const orderDetails = await ChiTietDonDat.find({ donDatId: order._id });
+        const soLuong = orderDetails.reduce((sum, detail) => sum + detail.soLuong, 0);
+        return {
+          ...order.toObject(),
+          soLuong,
+        };
+      })
+    );
 
     // Trả về response
     return res.status(200).json({
       message: "Cập nhật trạng thái đơn đặt hàng thành công.",
-      saleInvoices: { orders: allOrders, totalOrders },
+      saleInvoices: ordersWithQuantities,
     });
   } catch (error) {
     console.error("Lỗi khi cập nhật trạng thái đơn đặt hàng:", error);
@@ -568,20 +575,30 @@ export const confirmOrder = async (
     order.trangThaiDon = "Đã xác nhận";
     await order.save();
 
-    // Lấy danh sách tất cả đơn đặt hàng và tổng số lượng
-    const allOrders = await DonDat.find();
-    const totalOrders = allOrders.length;
+    // Lấy danh sách tất cả đơn đặt hàng và tổng số lượng sản phẩm
+    const allOrders = await DonDat.find({ trangThaiDon: { $ne: "Giỏ hàng" } });
+    const ordersWithQuantities = await Promise.all(
+      allOrders.map(async (order) => {
+        const orderDetails = await ChiTietDonDat.find({ donDatId: order._id });
+        const soLuong = orderDetails.reduce((sum, detail) => sum + detail.soLuong, 0);
+        return {
+          ...order.toObject(),
+          soLuong,
+        };
+      })
+    );
 
     // Trả về response
     return res.status(200).json({
       message: "Cập nhật trạng thái đơn đặt hàng thành công.",
-      saleInvoices: { orders: allOrders, totalOrders },
+      saleInvoices: ordersWithQuantities,
     });
   } catch (error) {
     console.error("Lỗi khi cập nhật trạng thái đơn đặt hàng:", error);
     return res.status(500).json({ message: "Lỗi hệ thống máy chủ." });
   }
 };
+
 
 /**
  * @description Hủy đơn đặt hàng

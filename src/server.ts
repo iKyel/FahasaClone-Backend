@@ -5,6 +5,7 @@ import { Request, Response, NextFunction } from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
+import WebSocket from "ws";
 
 // db
 import connectDB from "./connection/db";
@@ -55,8 +56,25 @@ app.get('/', (req: Request, res: Response) => {
 connectDB();
 
 // Ket noi server
-app.listen(port, () => {
+const server = app.listen(port, () => {
     console.log(`Server dang chay tren cong http://localhost:${port}`);
 });
 
+// Tạo websocket
+export const wss = new WebSocket.Server({ server });
+
+wss.on('connection', (ws) => {
+    console.log('Client connected');
+
+    ws.on('message', (message) => {
+        console.log(`Received message => ${message}`);
+        ws.send(`Received message: ${message}`);
+    });
+
+    ws.send('Hello! Message From Server!!');    // Gửi tin nhắn đến client khi kết nối lần đầu thành công
+
+    ws.on('close', () => {
+        console.log('Client disconnected');
+    });
+});
 export default app;

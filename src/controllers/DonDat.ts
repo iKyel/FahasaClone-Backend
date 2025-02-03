@@ -7,6 +7,8 @@ import getUserCart, { getUserCartDetail } from "../utils/getUserCart";
 import ChiTietDonDatModel from "../models/ChiTietDonDat";
 import { ISanPham } from "../interface/ModelInterface";
 import { Auth } from "mongodb";
+import { wss } from "../server";
+import WebSocket from "ws";
 
 /**
  * @description Controller lấy thông tin giỏ hàng của người dùng
@@ -113,6 +115,23 @@ export const addToCart = async (req: AuthenticatedRequest, res: Response) => {
     );
     // Lấy cartDetail của người dùng sau khi cập nhật
     const newCartDetail = await getUserCartDetail(cart?._id);
+    
+    const numOfProducts = newCartDetail.length;
+    const userId = user._id;
+    // Gửi số lượng sản phẩm trong giỏ về client thông qua websocket
+    wss.clients.forEach((client: WebSocket & { userId?: string }) => {
+      if (client.readyState === WebSocket.OPEN && client.userId === userId.toString()) {
+        // console.log(client.userId);
+        client.send(
+          JSON.stringify({
+            type: "cart",
+            userId: userId,
+            numOfProducts,
+          })
+        );
+      }
+    });
+
     res.status(200).json({
       message: "Thêm sản phẩm vào giỏ hàng thành công!",
       cart,

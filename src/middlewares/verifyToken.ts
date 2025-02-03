@@ -2,6 +2,8 @@ import { Request, Response, NextFunction } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { AuthenticatedRequest } from "../interface/AutheticatedRequest";
 import TaiKhoan from "../models/TaiKhoan";
+import { wss } from "../server";
+import WebSocket from "ws";
 
 const SECRET_KEY = process.env.JWT_SECRET || "";
 
@@ -29,6 +31,12 @@ async function verifyToken(req: AuthenticatedRequest, res: Response, next: NextF
                 }
                 // If Oke, then store 'user' in request and move to next middleware
                 req.user = user;
+
+                // Gán userId vào webSocket
+                wss.on('connection', (ws: WebSocket & { userId?: string }) => {
+                    ws.userId = user._id.toString();
+                });
+
                 next();
             }
         } catch (error) {

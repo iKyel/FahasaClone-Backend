@@ -77,3 +77,4 @@ wss.on('connection', (ws) => {
         console.log('Client disconnected');
     });
 });
+export default app;

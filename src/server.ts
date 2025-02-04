@@ -61,7 +61,10 @@ const server = app.listen(port, () => {
 });
 
 // Tạo websocket
-export const wss = new WebSocket.Server({ server });
+const wssPort = 3415;
+export const wss = new WebSocket.Server({ port: wssPort }, () => {
+    console.log(`WebSocket server is running on ws://localhost:${wssPort}`);
+});
 
 wss.on('connection', (ws) => {
     console.log('Client connected');

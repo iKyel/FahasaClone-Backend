@@ -134,8 +134,8 @@ export const addToCart = async (req: AuthenticatedRequest, res: Response) => {
 
     res.status(200).json({
       message: "Thêm sản phẩm vào giỏ hàng thành công!",
-      cart,
-      cartDetail: newCartDetail,
+    //   cart,
+    //   cartDetail: newCartDetail,
     });
   } catch (err) {
     console.log(err);

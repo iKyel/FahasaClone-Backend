@@ -71,7 +71,11 @@ wss.on('connection', (ws) => {
         ws.send(`Received message: ${message}`);
     });
 
-    ws.send('Hello! Message From Server!!');    // Gửi tin nhắn đến client khi kết nối lần đầu thành công
+    ws.send(
+        JSON.stringify({
+            message: 'Hello! Message From Server!!'
+        })
+    );    // Gửi tin nhắn đến client khi kết nối lần đầu thành công
 
     ws.on('close', () => {
         console.log('Client disconnected');

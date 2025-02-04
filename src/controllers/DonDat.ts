@@ -628,6 +628,20 @@ export const confirmOrder = async (
       })
     );
 
+    // Gửi ordersWithQuantities cho client thông qua websocket
+    const userId = order.khachHangId;
+    wss.clients.forEach((client: WebSocket & { userId?: string }) => {
+      if (client.readyState === WebSocket.OPEN && client.userId === userId?.toString()) {
+        client.send(
+          JSON.stringify({
+            type: "confirmedOrder",
+            userId: userId,
+            saleInvoices: ordersWithQuantities,
+          })
+        );
+      }
+    });
+
     // Trả về response
     return res.status(200).json({
       message: "Cập nhật trạng thái đơn đặt hàng thành công.",
